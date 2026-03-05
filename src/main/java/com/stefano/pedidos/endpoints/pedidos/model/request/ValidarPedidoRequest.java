@@ -1,0 +1,14 @@
+package com.stefano.pedidos.endpoints.pedidos.model.request;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+public record ValidarPedidoRequest(
+        @NotNull(message = "Usuário é obrigatório")
+        @Positive(message = "Usuário inválido")
+        Long usuarioId,
+
+        @NotNull(message = "Pedido é obrigatório")
+        @Positive(message = "Pedido inválido")
+        Long pedidoId
+) {}
