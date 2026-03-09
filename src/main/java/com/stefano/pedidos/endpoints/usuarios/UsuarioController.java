@@ -1,7 +1,7 @@
 package com.stefano.pedidos.endpoints.usuarios;
 
-import com.stefano.pedidos.endpoints.usuarios.model.request.UsuarioRequest;
-import com.stefano.pedidos.endpoints.usuarios.model.response.UsuarioResponse;
+import com.stefano.pedidos.endpoints.usuarios.dto.request.UsuarioRequest;
+import com.stefano.pedidos.endpoints.usuarios.dto.response.UsuarioResponse;
 import com.stefano.pedidos.endpoints.usuarios.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -9,8 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("usuarios")

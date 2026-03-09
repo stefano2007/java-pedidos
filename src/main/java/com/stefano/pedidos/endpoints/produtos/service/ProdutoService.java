@@ -3,16 +3,17 @@ package com.stefano.pedidos.endpoints.produtos.service;
 import com.stefano.pedidos.endpoints.produtos.entity.Produto;
 import com.stefano.pedidos.endpoints.produtos.entity.ProdutoEstoque;
 import com.stefano.pedidos.endpoints.produtos.entity.StatusEstoque;
-import com.stefano.pedidos.endpoints.produtos.model.request.AtualizarProdutoEstoqueConferenciaRequest;
-import com.stefano.pedidos.endpoints.produtos.model.request.ProdutoEstoqueRequest;
-import com.stefano.pedidos.endpoints.produtos.model.response.ProdutoEstoqueResponse;
+import com.stefano.pedidos.endpoints.produtos.dto.request.AtualizarProdutoEstoqueConferenciaRequest;
+import com.stefano.pedidos.endpoints.produtos.dto.request.ProdutoEstoqueRequest;
+import com.stefano.pedidos.endpoints.produtos.dto.response.ProdutoEstoqueResponse;
 import com.stefano.pedidos.endpoints.produtos.repository.ProdutoEstoqueRepository;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
 import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
-import com.stefano.pedidos.endpoints.produtos.model.request.ProdutoRequest;
-import com.stefano.pedidos.endpoints.produtos.model.response.ProdutoResponse;
+import com.stefano.pedidos.endpoints.produtos.dto.request.ProdutoRequest;
+import com.stefano.pedidos.endpoints.produtos.dto.response.ProdutoResponse;
 import com.stefano.pedidos.endpoints.produtos.repository.ProdutoRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -94,31 +95,29 @@ public class ProdutoService {
     }
 
 
+    @Transactional
     public List<ProdutoEstoqueResponse> atualizarEstoque(@Valid AtualizarProdutoEstoqueConferenciaRequest request) {
-
-        // validar usuário
         Usuario usuarioConferencia = usuarioRepository.findById(request.usuarioId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
-        List<ProdutoEstoque> novosProdutosEstoque = new ArrayList<>();
-        for (AtualizarProdutoEstoqueConferenciaRequest.AtualizarProdutoEstoqueConferenciaItemRequest item : request.itens()) {
-            ProdutoEstoque alterarProdutoEstoque = produtoEstoqueRepository.findById(item.produtoEstoqueId())
-                    .orElseThrow(() ->
-                            new RecursoNaoEncontradoException("Produto Estoque não encontrado: %d".formatted(item.produtoEstoqueId())));
+        List<ProdutoEstoque> produtosAtualizados = request.itens().stream()
+                .map(item -> atualizarItemEstoque(item, usuarioConferencia))
+                .toList();
 
-            //todo: revisar logica
-            if (StatusEstoque.CONFERIDO.equals(StatusEstoque.from(item.statusEstoque()))) {
-                alterarProdutoEstoque.conferirEstoque(usuarioConferencia, item.quantidadeConferida());
-                novosProdutosEstoque.add(alterarProdutoEstoque);
-            } else if (StatusEstoque.REJEITADO.equals(StatusEstoque.from(item.statusEstoque()))) {
-                alterarProdutoEstoque.rejeitaEstoque(usuarioConferencia);
-                novosProdutosEstoque.add(alterarProdutoEstoque);
-            }
-        }
-
-        produtoEstoqueRepository.saveAll(novosProdutosEstoque);
-        return novosProdutosEstoque.stream()
+        produtoEstoqueRepository.saveAll(produtosAtualizados);
+        return produtosAtualizados.stream()
                 .map(ProdutoEstoqueResponse::of)
                 .toList();
     }
+
+    private ProdutoEstoque atualizarItemEstoque(
+            AtualizarProdutoEstoqueConferenciaRequest.AtualizarProdutoEstoqueConferenciaItemRequest item,
+            Usuario usuarioConferencia) {
+        ProdutoEstoque produtoEstoque = produtoEstoqueRepository.findById(item.produtoEstoqueId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Produto Estoque não encontrado: %d".formatted(item.produtoEstoqueId())));
+
+        produtoEstoque.atualizarStatus(StatusEstoque.from(item.statusEstoque()), usuarioConferencia, item.quantidadeConferida());
+        return produtoEstoque;
+    }
+
 }

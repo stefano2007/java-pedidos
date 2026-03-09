@@ -1,6 +1,5 @@
-package com.stefano.pedidos.endpoints.produtos.model.request;
+package com.stefano.pedidos.endpoints.produtos.dto.request;
 
-import com.stefano.pedidos.endpoints.produtos.entity.StatusEstoque;
 import com.stefano.pedidos.endpoints.produtos.validation.annotation.StatusConferenciaValido;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;

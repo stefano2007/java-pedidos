@@ -15,9 +15,6 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "data_criacao")
-    private LocalDateTime dataCriacao = LocalDateTime.now();
-
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
@@ -25,11 +22,17 @@ public class Pedido {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
+    @Column(name = "data_criacao")
+    private LocalDateTime dataCriacao = LocalDateTime.now();
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoItem> itens;
 
     @Column(name = "motivo_cancelamento")
     private String motivoCancelamento;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PedidoStatus> historicoStatus = new ArrayList<>();
 
     protected Pedido() {
     }
@@ -37,11 +40,15 @@ public class Pedido {
     public static Pedido criarPedido(Usuario usuario) {
         Pedido novoPedido = new Pedido();
         novoPedido.usuario = usuario;
-        novoPedido.status = StatusPedido.CRIADO;
+        novoPedido.alterarStatus(StatusPedido.CRIADO);
         return novoPedido;
     }
 
-    public void adicionarItem(PedidoItem item) {
+    public void adicionarPedidoItens(List<PedidoItem> pedidoItens) {
+        pedidoItens.forEach(this::adicionarItem);
+    }
+
+    private void adicionarItem(PedidoItem item) {
         if (this.itens == null) {
             this.itens = new ArrayList<>();
         }
@@ -49,16 +56,7 @@ public class Pedido {
         item.setPedido(this);
     }
 
-    public void validarPedido() {
-        this.alterarStatus(StatusPedido.VALIDADO);
-        this.itens.forEach(PedidoItem::validarPeditoItem);
-    }
-
-    public void verificarCancelamentoAutomatico() {
-
-        if (this.status == StatusPedido.ENTREGUE) {
-            return;
-        }
+    public void cancelarSeTodosItensCanceladosOuSemEstoque() {
 
         if (this.itens == null || this.itens.isEmpty()) {
             this.cancelar("Não existe itens para o pedido");
@@ -72,14 +70,74 @@ public class Pedido {
         }
     }
 
+    public boolean criado() {
+        return StatusPedido.CRIADO.equals(this.status);
+    }
+
+    public boolean validado() {
+        return StatusPedido.VALIDADO.equals(this.status);
+    }
+
+    public void alterarStatusValidado() {
+        this.alterarStatus(StatusPedido.VALIDADO);
+        this.itens.forEach(PedidoItem::validarPeditoItem);
+    }
+
+    public boolean reservadoEstoque() {
+        return StatusPedido.RESERVADO_ESTOQUE.equals(this.status);
+    }
+
+    public void alterarStatusReservadoEstoqueOuCancelar() {
+        this.cancelarSeTodosItensCanceladosOuSemEstoque();
+        if (!cancelado()) {
+            this.alterarStatus(StatusPedido.RESERVADO_ESTOQUE);
+        }
+    }
+
+    public boolean emSeperacao() {
+        return StatusPedido.EM_SEPARACAO.equals(this.status);
+    }
+
+    public void alterarStatusEmSeparacao() {
+        this.alterarStatus(StatusPedido.EM_SEPARACAO);
+    }
+
+    public boolean separado() {
+        return StatusPedido.SEPARADO.equals(this.status);
+    }
+
+    public void alterarStatusSeparado() {
+        this.alterarStatus(StatusPedido.SEPARADO);
+    }
+
+    public boolean emTransporte() {
+        return StatusPedido.EM_TRANSPORTE.equals(this.status);
+    }
+
+    public void alterarStatusEmTransporte() {
+        this.alterarStatus(StatusPedido.EM_TRANSPORTE);
+    }
+
+    public boolean entregue() {
+        return StatusPedido.ENTREGUE.equals(this.status);
+    }
+
+    public void alterarStatusEntregue() {
+        this.alterarStatus(StatusPedido.ENTREGUE);
+    }
+
+    public boolean cancelado() {
+        return StatusPedido.CANCELADO.equals(this.status);
+    }
+
     public void cancelar(String motivoCancelamento) {
         alterarStatus(StatusPedido.CANCELADO);
         this.motivoCancelamento = motivoCancelamento;
     }
 
-    public void alterarStatus(StatusPedido novoStatus) {
+    private void alterarStatus(StatusPedido novoStatus) {
 
-        if (!this.status.podeIrPara(novoStatus)) {
+        if (this.status != null && !this.status.podeIrPara(novoStatus)) {
             throw new IllegalStateException(
                     "Pedido %s, Transição inválida de %s para %s"
                             .formatted(this.id, this.status, novoStatus)
@@ -87,10 +145,14 @@ public class Pedido {
         }
 
         this.status = novoStatus;
+        this.adicionarHistoricoStatusPedido();
     }
 
-    public void pedidoReservado(){
-       this.alterarStatus(StatusPedido.RESERVADO_ESTOQUE);
+    private void adicionarHistoricoStatusPedido() {
+        if (this.historicoStatus == null) {
+            this.historicoStatus = new ArrayList<>();
+        }
+        this.historicoStatus.add(PedidoStatus.criarPedidoStatus(this));
     }
 
     public Long getId() {
@@ -116,4 +178,10 @@ public class Pedido {
     public String getMotivoCancelamento() {
         return motivoCancelamento;
     }
+
+    public List<PedidoStatus> getHistoricoStatus() {
+        return historicoStatus;
+    }
+
+
 }

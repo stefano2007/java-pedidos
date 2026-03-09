@@ -1,9 +1,9 @@
-package com.stefano.pedidos.endpoints.produtos.model.response;
+package com.stefano.pedidos.endpoints.produtos.dto.response;
 
 import com.stefano.pedidos.endpoints.produtos.entity.TipoMovimentacaoEstoque;
 import com.stefano.pedidos.endpoints.produtos.entity.ProdutoEstoque;
 import com.stefano.pedidos.endpoints.produtos.entity.StatusEstoque;
-import com.stefano.pedidos.endpoints.usuarios.model.response.UsuarioResponse;
+import com.stefano.pedidos.endpoints.usuarios.dto.response.UsuarioResponse;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

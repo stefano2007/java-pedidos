@@ -1,4 +1,4 @@
-package com.stefano.pedidos.endpoints.usuarios.model.response;
+package com.stefano.pedidos.endpoints.usuarios.dto.response;
 
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 

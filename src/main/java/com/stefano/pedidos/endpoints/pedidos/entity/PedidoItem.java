@@ -40,31 +40,32 @@ public class PedidoItem {
     protected PedidoItem() {
     }
 
-    public static PedidoItem criarItemPedido(Pedido pedido, Produto produto, Integer quantidade) {
-        PedidoItem novoPedidoItem = new PedidoItem();
-        novoPedidoItem.statusItem = StatusPedidoItem.CRIADO;
-        novoPedidoItem.pedido = pedido;
-        novoPedidoItem.produto = produto;
-        novoPedidoItem.quantidade = quantidade;
-        novoPedidoItem.precoUnitario = produto.getPreco();
-
-        //todo: validar item
-        return novoPedidoItem;
-    }
-
-    public static PedidoItem criarItemPedidoCancelado(Pedido pedido, Integer quantidade, String motivoCancelamento) {
+    public static PedidoItem criarItemPedidoCriadoOuCancelado(Pedido pedido, Produto produto, Integer quantidade, Long produtoIdSolicitado) {
         PedidoItem novoPedidoItem = new PedidoItem();
         novoPedidoItem.pedido = pedido;
         novoPedidoItem.quantidade = quantidade;
-        novoPedidoItem.precoUnitario = new BigDecimal(0);
 
-        novoPedidoItem.cancelar(motivoCancelamento);
+        if (produto == null){
+            novoPedidoItem.precoUnitario = new BigDecimal(0);
+            novoPedidoItem.cancelarItem("Produto não encontrado: %d".formatted(produtoIdSolicitado));
+        } else {
+            novoPedidoItem.produto = produto;
+            novoPedidoItem.precoUnitario = produto.getPreco();
+            novoPedidoItem.statusItem = StatusPedidoItem.CRIADO;
+        }
 
         return novoPedidoItem;
     }
+
+    public boolean criado() {
+        return StatusPedidoItem.CRIADO.equals(this.statusItem);
+    }
+
 
     public void validarPeditoItem() {
-        this.alterarStatusItem(StatusPedidoItem.VALIDADO);
+        if (this.statusItem.podeIrPara(StatusPedidoItem.VALIDADO)){
+            this.alterarStatusItem(StatusPedidoItem.VALIDADO);
+        }
     }
 
     public void reservarEstoque(Integer quantidadeAtendida) {
@@ -84,7 +85,7 @@ public class PedidoItem {
         this.motivoCancelamento = motivoCancelamento;
     }
 
-    public void cancelar(String motivoCancelamento) {
+    public void cancelarItem(String motivoCancelamento) {
         alterarStatusItem(StatusPedidoItem.CANCELADO);
         this.quantidadeAtendida = 0;
         this.motivoCancelamento = motivoCancelamento;
@@ -92,7 +93,7 @@ public class PedidoItem {
 
     public void alterarStatusItem(StatusPedidoItem novoStatus) {
 
-        if (!this.statusItem.podeIrPara(novoStatus)) {
+        if (this.statusItem != null && !this.statusItem.podeIrPara(novoStatus)) {
             throw new IllegalStateException(
                     "Pedido Item %s, Transição inválida de %s para %s"
                             .formatted(this.id, this.statusItem, novoStatus)
@@ -137,5 +138,6 @@ public class PedidoItem {
     public void setPedido(Pedido pedido) {
         this.pedido = pedido;
     }
+
 
 }

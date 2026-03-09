@@ -1,10 +1,10 @@
 package com.stefano.pedidos.endpoints.produtos;
 
-import com.stefano.pedidos.endpoints.produtos.model.request.AtualizarProdutoEstoqueConferenciaRequest;
-import com.stefano.pedidos.endpoints.produtos.model.request.ProdutoEstoqueRequest;
-import com.stefano.pedidos.endpoints.produtos.model.request.ProdutoRequest;
-import com.stefano.pedidos.endpoints.produtos.model.response.ProdutoEstoqueResponse;
-import com.stefano.pedidos.endpoints.produtos.model.response.ProdutoResponse;
+import com.stefano.pedidos.endpoints.produtos.dto.request.AtualizarProdutoEstoqueConferenciaRequest;
+import com.stefano.pedidos.endpoints.produtos.dto.request.ProdutoEstoqueRequest;
+import com.stefano.pedidos.endpoints.produtos.dto.request.ProdutoRequest;
+import com.stefano.pedidos.endpoints.produtos.dto.response.ProdutoEstoqueResponse;
+import com.stefano.pedidos.endpoints.produtos.dto.response.ProdutoResponse;
 import com.stefano.pedidos.endpoints.produtos.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

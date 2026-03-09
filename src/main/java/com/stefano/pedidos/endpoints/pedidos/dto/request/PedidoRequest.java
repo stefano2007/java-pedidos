@@ -1,4 +1,4 @@
-package com.stefano.pedidos.endpoints.pedidos.model.request;
+package com.stefano.pedidos.endpoints.pedidos.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;

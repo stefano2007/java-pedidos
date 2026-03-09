@@ -55,6 +55,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Kafka -->
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+
 		<!-- Test (substitui jpa-test + webmvc-test) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

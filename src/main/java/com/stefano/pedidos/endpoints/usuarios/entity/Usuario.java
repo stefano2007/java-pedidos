@@ -38,8 +38,6 @@ public class Usuario {
         novoUsuario.nome = nome;
         novoUsuario.email = email;
         novoUsuario.senha = senha;
-
-        //todo: Validar usuario
         return novoUsuario;
     }
 

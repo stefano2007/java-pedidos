@@ -4,16 +4,14 @@ import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
 import com.stefano.pedidos.endpoints.usuarios.exception.SenhaInvalidaException;
 import com.stefano.pedidos.endpoints.usuarios.exception.UsuarioJaExisteException;
-import com.stefano.pedidos.endpoints.usuarios.model.request.UsuarioRequest;
-import com.stefano.pedidos.endpoints.usuarios.model.response.UsuarioResponse;
+import com.stefano.pedidos.endpoints.usuarios.dto.request.UsuarioRequest;
+import com.stefano.pedidos.endpoints.usuarios.dto.response.UsuarioResponse;
 import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {

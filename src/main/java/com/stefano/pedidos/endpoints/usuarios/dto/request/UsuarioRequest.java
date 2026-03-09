@@ -1,5 +1,6 @@
-package com.stefano.pedidos.endpoints.usuarios.model.request;
+package com.stefano.pedidos.endpoints.usuarios.dto.request;
 
+import com.stefano.pedidos.endpoints.usuarios.validation.annotation.SenhaValida;
 import jakarta.validation.constraints.*;
 
 public record UsuarioRequest(
@@ -12,6 +13,7 @@ public record UsuarioRequest(
         String email,
 
         @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
+        @SenhaValida
         String senha,
 
         String confirmacaoSenha

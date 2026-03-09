@@ -59,7 +59,16 @@ public class ProdutoEstoque {
         return novoProdutoEstoque;
     }
 
-    public void conferirEstoque(Usuario usuarioConferencia, Integer novaQuantidade) {
+    public void atualizarStatus(StatusEstoque novoStatus, Usuario usuario, Integer quantidadeConferida) {
+        if (StatusEstoque.CONFERIDO.equals(novoStatus)) {
+            conferirEstoque(usuario, quantidadeConferida);
+        } else if (StatusEstoque.REJEITADO.equals(novoStatus)) {
+            rejeitaEstoque(usuario);
+        }
+    }
+
+
+    private void conferirEstoque(Usuario usuarioConferencia, Integer novaQuantidade) {
         if (novaQuantidade > quantidade) {
             throw new IllegalStateException(
                     "Produto Estoque %s, Quantidade conferida (%s) não pode ser maior que a quantidade do item (%s)"
@@ -71,13 +80,13 @@ public class ProdutoEstoque {
         this.usuarioConferencia = usuarioConferencia;
     }
 
-    public void rejeitaEstoque(Usuario usuarioConferencia) {
+    private void rejeitaEstoque(Usuario usuarioConferencia) {
         this.alterarStatus(StatusEstoque.REJEITADO);
         this.quantidadeEstoque = 0;
         this.usuarioConferencia = usuarioConferencia;
     }
 
-    public void alterarStatus(StatusEstoque novoStatus) {
+    private void alterarStatus(StatusEstoque novoStatus) {
 
         if (!this.statusEstoque.podeIrPara(novoStatus)) {
             throw new IllegalStateException(

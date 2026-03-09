@@ -1,25 +1,24 @@
 package com.stefano.pedidos.endpoints.pedidos.service;
 
-import com.stefano.pedidos.endpoints.pedidos.entity.Pedido;
-import com.stefano.pedidos.endpoints.pedidos.entity.PedidoItem;
-import com.stefano.pedidos.endpoints.pedidos.entity.StatusPedidoItem;
-import com.stefano.pedidos.endpoints.pedidos.model.request.ReservarEstoquePedidoRequest;
-import com.stefano.pedidos.endpoints.pedidos.model.request.ValidarPedidoRequest;
+import com.stefano.pedidos.endpoints.pedidos.entity.*;
+import com.stefano.pedidos.endpoints.pedidos.dto.request.ValidarPedidoRequest;
 import com.stefano.pedidos.endpoints.produtos.entity.Produto;
 import com.stefano.pedidos.endpoints.produtos.entity.ProdutoEstoqueAtualView;
 import com.stefano.pedidos.endpoints.produtos.repository.ProdutoEstoqueAtualViewRepository;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
-import com.stefano.pedidos.endpoints.pedidos.model.request.PedidoRequest;
-import com.stefano.pedidos.endpoints.pedidos.model.response.PedidoResponse;
+import com.stefano.pedidos.endpoints.pedidos.dto.request.PedidoRequest;
+import com.stefano.pedidos.endpoints.pedidos.dto.response.PedidoResponse;
 import com.stefano.pedidos.endpoints.pedidos.repository.PedidoRepository;
 import com.stefano.pedidos.endpoints.produtos.repository.ProdutoRepository;
 import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
+import com.stefano.pedidos.kafka.producer.PedidoProducer;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PedidoService {
@@ -28,12 +27,15 @@ public class PedidoService {
     private final UsuarioRepository usuarioRepository;
     private final ProdutoRepository produtoRepository;
     private final ProdutoEstoqueAtualViewRepository produtoEstoqueAtualViewRepository;
+    private final PedidoProducer pedidoProducer;
 
-    public PedidoService(PedidoRepository pedidoRepository, UsuarioRepository usuarioRepository, ProdutoRepository produtoRepository, ProdutoEstoqueAtualViewRepository produtoEstoqueAtualViewRepository) {
+    public PedidoService(PedidoRepository pedidoRepository, UsuarioRepository usuarioRepository, ProdutoRepository produtoRepository,
+                         ProdutoEstoqueAtualViewRepository produtoEstoqueAtualViewRepository, PedidoProducer pedidoProducer) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioRepository = usuarioRepository;
         this.produtoRepository = produtoRepository;
         this.produtoEstoqueAtualViewRepository = produtoEstoqueAtualViewRepository;
+        this.pedidoProducer = pedidoProducer;
     }
 
     public Page<PedidoResponse> obterTodos(Pageable pageable) {
@@ -57,31 +59,22 @@ public class PedidoService {
 
         Pedido novoPedido = Pedido.criarPedido(usuario);
 
-        // montar itens do pedido
-        for (PedidoRequest.PedidoItemRequest itemRequest : request.itens()) {
-            Long produtoId = itemRequest.produtoId();
-            Produto produto = produtoRepository.findById(produtoId).orElse(null);
+        List<PedidoItem> pedidoItens = request.itens().stream()
+                .map(itemRequest -> {
+                    Produto produto = produtoRepository
+                            .findById(itemRequest.produtoId())
+                            .orElse(null);
 
-            PedidoItem pedidoItem;
+                    return PedidoItem.criarItemPedidoCriadoOuCancelado(
+                            novoPedido,
+                            produto,
+                            itemRequest.quantidade(),
+                            itemRequest.produtoId()
+                    );
+                })
+                .toList();
 
-            if (produto != null) {
-                pedidoItem = PedidoItem.criarItemPedido(
-                        novoPedido,
-                        produto,
-                        itemRequest.quantidade()
-                );
-            } else {
-                pedidoItem = PedidoItem.criarItemPedidoCancelado(
-                        novoPedido,
-                        itemRequest.quantidade(),
-                        "Produto não encontrado: %d".formatted(produtoId)
-                );
-            }
-
-            novoPedido.adicionarItem(pedidoItem);
-        }
-
-        novoPedido.verificarCancelamentoAutomatico();
+        novoPedido.adicionarPedidoItens(pedidoItens);
         pedidoRepository.save(novoPedido);
 
         return PedidoResponse.of(novoPedido);
@@ -95,58 +88,42 @@ public class PedidoService {
                 .orElseThrow(() ->
                         new RecursoNaoEncontradoException("Pedido não encontrado"));
 
-        pedido.validarPedido();
+        pedido.alterarStatusValidado();
+
         this.pedidoRepository.save(pedido);
+        this.pedidoProducer.publicar(pedido);
 
         return PedidoResponse.of(pedido);
     }
 
+
     @Transactional
-    public PedidoResponse reservarEstoquePedido(@Valid ReservarEstoquePedidoRequest request) {
+    public synchronized Pedido reservarEstoquePedido(Long pedidoId) {
 
-        Usuario usuario = usuarioRepository.findById(request.usuarioId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: %s".formatted(pedidoId)));
 
-        Pedido pedido = pedidoRepository.findById(request.pedidoId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
+        for (PedidoItem item : pedido.getItens().stream().filter(i -> i.getStatusItem() == StatusPedidoItem.VALIDADO).toList()) {
 
-        for (ReservarEstoquePedidoRequest.ReservarEstoquePedidoItemRequest itemRequest : request.itens()) {
-
-            PedidoItem item = pedido.getItens()
-                    .stream()
-                    .filter(i -> i.getId().equals(itemRequest.pedidoItemId()))
-                    .findFirst()
-                    .orElseThrow(() ->
-                            new RecursoNaoEncontradoException(
-                                    "Item do pedido não encontrado: %d".formatted(itemRequest.pedidoItemId())
-                            ));
-
-            if (item.getStatusItem() != StatusPedidoItem.VALIDADO) {
-                continue;
-            }
-
-            Long produtoId = item.getProduto().getId();
-
-            Integer estoqueAtual = produtoEstoqueAtualViewRepository
-                    .findById(produtoId)
+            final Integer estoqueAtual = produtoEstoqueAtualViewRepository
+                    .findById(item.getProduto().getId())
                     .map(ProdutoEstoqueAtualView::getQuantidadeEstoque)
                     .orElse(0);
 
-            if (estoqueAtual >= itemRequest.quantidadeConferida()) {
-                item.reservarEstoque(itemRequest.quantidadeConferida());
+            final int quantidadeAtendida = estoqueAtual >= item.getQuantidade()
+                    ? item.getQuantidade()
+                    : Math.max(estoqueAtual, 0);
+
+            if (quantidadeAtendida > 0) {
+                item.reservarEstoque(quantidadeAtendida);
             } else {
                 item.semEstoque("Estoque insuficiente");
             }
         }
 
-        //todo: revisa melhorar essa logica joga para classe pedido toda logica de conferiar produtos
-        pedido.pedidoReservado();
-
-        //todo: verificar se pode adicionar a verificação dentro da classe pedidos
-        pedido.verificarCancelamentoAutomatico();
-
+        pedido.alterarStatusReservadoEstoqueOuCancelar();
         pedidoRepository.save(pedido);
 
-        return PedidoResponse.of(pedido);
+        return pedido;
     }
 }

@@ -12,7 +12,7 @@ public enum StatusPedidoItem {
 
     VALIDADO {
         public Set<StatusPedidoItem> proximos() {
-            return Set.of(RESERVADO_ESTOQUE, CANCELADO);
+            return Set.of(RESERVADO_ESTOQUE, SEM_ESTOQUE, CANCELADO);
         }
     },
 

@@ -40,7 +40,10 @@ public class Produto {
         novoProduto.descricao = descricao;
         novoProduto.preco = preco;
 
-        //todo: validar regras para produto
+        if (preco.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("O preço do produto deve ser maior que zero.");
+        }
+
         return  novoProduto;
     }
 

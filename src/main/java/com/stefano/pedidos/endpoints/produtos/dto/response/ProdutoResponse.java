@@ -1,4 +1,4 @@
-package com.stefano.pedidos.endpoints.produtos.model.response;
+package com.stefano.pedidos.endpoints.produtos.dto.response;
 
 import com.stefano.pedidos.endpoints.produtos.entity.Produto;
 

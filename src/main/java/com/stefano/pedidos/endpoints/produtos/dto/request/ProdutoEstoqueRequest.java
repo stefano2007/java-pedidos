@@ -1,4 +1,4 @@
-package com.stefano.pedidos.endpoints.produtos.model.request;
+package com.stefano.pedidos.endpoints.produtos.dto.request;
 
 import com.stefano.pedidos.endpoints.produtos.entity.TipoMovimentacaoEstoque;
 import jakarta.validation.Valid;
