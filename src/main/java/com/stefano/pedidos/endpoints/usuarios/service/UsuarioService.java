@@ -9,6 +9,7 @@ import com.stefano.pedidos.endpoints.usuarios.dto.response.UsuarioResponse;
 import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,9 +17,11 @@ import java.util.Optional;
 @Service
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UsuarioResponse criar(UsuarioRequest request) {
@@ -30,7 +33,9 @@ public class UsuarioService {
             throw new UsuarioJaExisteException("Usuário já existe");
         }
 
-        Usuario novoUsuario = Usuario.criarUsuario(request.nome(), request.email(), request.senha());
+        String senhaCriptografada = passwordEncoder.encode(request.senha());
+
+        Usuario novoUsuario = Usuario.criarUsuario(request.nome(), request.email(), senhaCriptografada);
         usuarioRepository.save(novoUsuario);
 
         return UsuarioResponse.of(novoUsuario);
