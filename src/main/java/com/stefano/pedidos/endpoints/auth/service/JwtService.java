@@ -1,5 +1,6 @@
 package com.stefano.pedidos.endpoints.auth.service;
 
+import com.stefano.pedidos.config.model.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -24,9 +28,15 @@ import java.util.function.Function;
             return Keys.hmacShaKeyFor(jwtSecret.getBytes());
         }
 
-        public String gerarAccessToken(UserDetails user) {
+        public String gerarAccessToken(UserPrincipal user) {
+
+            Map<String, Object> claims = new HashMap<>();
+
+            claims.put("usuarioId", user.getUsuarioId());
+            claims.put("sessionId", UUID.randomUUID());
 
             return Jwts.builder()
+                    .setClaims(claims)
                     .setSubject(user.getUsername())
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))

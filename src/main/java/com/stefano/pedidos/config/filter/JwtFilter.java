@@ -1,5 +1,6 @@
 package com.stefano.pedidos.config.filter;
 
+import com.stefano.pedidos.endpoints.auth.service.CustomUserDetailsService;
 import com.stefano.pedidos.endpoints.auth.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -7,19 +8,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public JwtFilter(JwtService jwtService) {
+    public JwtFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService) {
         this.jwtService = jwtService;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Override
@@ -36,14 +39,16 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             String usuario = jwtService.extrairUsuario(token);
 
-            UsernamePasswordAuthenticationToken auth =
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(usuario);
+
+            UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
-                            usuario,
+                            userDetails,
                             null,
-                            List.of()
+                            userDetails.getAuthorities()
                     );
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 
         filterChain.doFilter(request, response);

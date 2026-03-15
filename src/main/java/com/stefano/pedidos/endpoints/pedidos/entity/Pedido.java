@@ -132,6 +132,7 @@ public class Pedido {
 
     public void cancelar(String motivoCancelamento) {
         alterarStatus(StatusPedido.CANCELADO);
+        this.itens.forEach(i -> i.cancelarItem(motivoCancelamento));
         this.motivoCancelamento = motivoCancelamento;
     }
 

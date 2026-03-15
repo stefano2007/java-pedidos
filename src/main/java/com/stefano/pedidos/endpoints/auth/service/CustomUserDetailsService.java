@@ -1,5 +1,6 @@
 package com.stefano.pedidos.endpoints.auth.service;
 
+import com.stefano.pedidos.config.model.UserPrincipal;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.User;
@@ -26,9 +27,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         Usuario usuario = usuarioRepository
                 .findByEmail(email)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("Usuário não encontrado"));
+                        new UsernameNotFoundException("Usuário não encontrado: %s".formatted(email)));
 
-        return new User(
+        return new UserPrincipal(
+                usuario.getId(),
                 usuario.getEmail(),
                 usuario.getSenha(),
                 List.of()

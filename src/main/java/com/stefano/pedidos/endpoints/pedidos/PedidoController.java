@@ -1,5 +1,6 @@
 package com.stefano.pedidos.endpoints.pedidos;
 
+import com.stefano.pedidos.endpoints.pedidos.dto.request.CancelarPedidoRequest;
 import com.stefano.pedidos.endpoints.pedidos.dto.request.PedidoRequest;
 import com.stefano.pedidos.endpoints.pedidos.dto.request.ValidarPedidoRequest;
 import com.stefano.pedidos.endpoints.pedidos.dto.response.PedidoResponse;
@@ -42,9 +43,15 @@ public class PedidoController {
         return ResponseEntity.ok().body(pedidoResponse);
     }
 
-    @PutMapping("validar")
-    public ResponseEntity<PedidoResponse> validarPedido(@Valid @RequestBody ValidarPedidoRequest request) {
-        PedidoResponse pedidoResponse = pedidoService.validarPedido(request);
+    @PostMapping("{pedidoId}/validar")
+    public ResponseEntity<PedidoResponse> validarPedido(@PathVariable("pedidoId") Long pedidoId, @Valid @RequestBody ValidarPedidoRequest request) {
+        PedidoResponse pedidoResponse = pedidoService.validarPedido(pedidoId);
+        return ResponseEntity.ok().body(pedidoResponse);
+    }
+
+    @PostMapping("{pedidoId}/cancelar")
+    public ResponseEntity<PedidoResponse> validarPedido(@PathVariable("pedidoId") Long pedidoId, @Valid @RequestBody CancelarPedidoRequest request) {
+        PedidoResponse pedidoResponse = pedidoService.cancelarPedido(pedidoId, request);
         return ResponseEntity.ok().body(pedidoResponse);
     }
 }

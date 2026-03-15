@@ -1,7 +1,8 @@
 package com.stefano.pedidos.endpoints.pedidos.service;
 
+import com.stefano.pedidos.config.model.UserPrincipal;
+import com.stefano.pedidos.endpoints.pedidos.dto.request.CancelarPedidoRequest;
 import com.stefano.pedidos.endpoints.pedidos.entity.*;
-import com.stefano.pedidos.endpoints.pedidos.dto.request.ValidarPedidoRequest;
 import com.stefano.pedidos.endpoints.produtos.entity.Produto;
 import com.stefano.pedidos.endpoints.produtos.entity.ProdutoEstoqueAtualView;
 import com.stefano.pedidos.endpoints.produtos.repository.ProdutoEstoqueAtualViewRepository;
@@ -16,6 +17,7 @@ import com.stefano.pedidos.kafka.producer.PedidoProducer;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,18 +46,14 @@ public class PedidoService {
     }
 
     public PedidoResponse obterPorId(Long pedidoId) {
-        return pedidoRepository.findById(pedidoId)
-                .map(PedidoResponse::of)
-                .orElseThrow(() ->
-                        new RecursoNaoEncontradoException("Pedido não encontrado"));
+        return PedidoResponse.of(tentaObterPedido(pedidoId));
     }
 
     @Transactional
     public PedidoResponse criarPedido(PedidoRequest request) {
 
         // validar usuário
-        Usuario usuario = usuarioRepository.findById(request.usuarioId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
+        Usuario usuario = tentaObterUsuario(request.usuarioId());
 
         Pedido novoPedido = Pedido.criarPedido(usuario);
 
@@ -81,14 +79,30 @@ public class PedidoService {
     }
 
     @Transactional
-    public PedidoResponse validarPedido(ValidarPedidoRequest request) {
+    public PedidoResponse validarPedido(Long pedidoId) {
 
         //validar pedido
-        Pedido pedido = pedidoRepository.findById(request.pedidoId())
-                .orElseThrow(() ->
-                        new RecursoNaoEncontradoException("Pedido não encontrado"));
+        Pedido pedido = tentaObterPedido(pedidoId);
 
         pedido.alterarStatusValidado();
+
+        this.pedidoRepository.save(pedido);
+        this.pedidoProducer.publicar(pedido);
+
+        return PedidoResponse.of(pedido);
+    }
+
+    @Transactional
+    public PedidoResponse cancelarPedido(Long pedidoId, CancelarPedidoRequest request) {
+
+        //validar pedido
+        Pedido pedido = tentaObterPedido(pedidoId);
+
+        UserPrincipal usuarioLogado = obterUsuarioLogado();
+        final String mensagemCompleto = "Id Usuario Cancelamento: %s, Motivo do cancelamento: %s"
+                .formatted(usuarioLogado.getUsuarioId(), request.motivoCancelamento());
+
+        pedido.cancelar(mensagemCompleto);
 
         this.pedidoRepository.save(pedido);
         this.pedidoProducer.publicar(pedido);
@@ -100,8 +114,7 @@ public class PedidoService {
     @Transactional
     public synchronized Pedido reservarEstoquePedido(Long pedidoId) {
 
-        Pedido pedido = pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: %s".formatted(pedidoId)));
+        Pedido pedido = tentaObterPedido(pedidoId);
 
         for (PedidoItem item : pedido.getItens().stream().filter(i -> i.getStatusItem() == StatusPedidoItem.VALIDADO).toList()) {
 
@@ -125,5 +138,19 @@ public class PedidoService {
         pedidoRepository.save(pedido);
 
         return pedido;
+    }
+
+    private Pedido tentaObterPedido(Long pedidoId) {
+        return pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: %s".formatted(pedidoId)));
+    }
+
+    private Usuario tentaObterUsuario(Long usuarioId) {
+        return usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado: %s".formatted(usuarioId)));
+    }
+
+    private UserPrincipal obterUsuarioLogado() {
+        return (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
