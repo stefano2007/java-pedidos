@@ -1,18 +1,18 @@
 package com.stefano.pedidos.endpoints.pedidos.service;
 
 import com.stefano.pedidos.config.model.UserPrincipal;
+import com.stefano.pedidos.endpoints.estoques.service.EstoqueService;
 import com.stefano.pedidos.endpoints.pedidos.dto.request.CancelarPedidoRequest;
 import com.stefano.pedidos.endpoints.pedidos.entity.*;
 import com.stefano.pedidos.endpoints.produtos.entity.Produto;
-import com.stefano.pedidos.endpoints.produtos.entity.ProdutoEstoqueAtualView;
-import com.stefano.pedidos.endpoints.produtos.repository.ProdutoEstoqueAtualViewRepository;
+import com.stefano.pedidos.endpoints.estoques.entity.ProdutoEstoqueAtualView;
+import com.stefano.pedidos.endpoints.produtos.service.ProdutoService;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
+import com.stefano.pedidos.endpoints.usuarios.service.UsuarioService;
 import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
 import com.stefano.pedidos.endpoints.pedidos.dto.request.PedidoRequest;
 import com.stefano.pedidos.endpoints.pedidos.dto.response.PedidoResponse;
 import com.stefano.pedidos.endpoints.pedidos.repository.PedidoRepository;
-import com.stefano.pedidos.endpoints.produtos.repository.ProdutoRepository;
-import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
 import com.stefano.pedidos.kafka.producer.PedidoProducer;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -21,22 +21,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final ProdutoRepository produtoRepository;
-    private final ProdutoEstoqueAtualViewRepository produtoEstoqueAtualViewRepository;
+    private final UsuarioService usuarioService;
+    private final ProdutoService produtoService;
+    private final EstoqueService estoqueService;
     private final PedidoProducer pedidoProducer;
 
-    public PedidoService(PedidoRepository pedidoRepository, UsuarioRepository usuarioRepository, ProdutoRepository produtoRepository,
-                         ProdutoEstoqueAtualViewRepository produtoEstoqueAtualViewRepository, PedidoProducer pedidoProducer) {
+    public PedidoService(PedidoRepository pedidoRepository, UsuarioService usuarioService, ProdutoService produtoService, EstoqueService estoqueService, PedidoProducer pedidoProducer) {
         this.pedidoRepository = pedidoRepository;
-        this.usuarioRepository = usuarioRepository;
-        this.produtoRepository = produtoRepository;
-        this.produtoEstoqueAtualViewRepository = produtoEstoqueAtualViewRepository;
+        this.usuarioService = usuarioService;
+        this.produtoService = produtoService;
+        this.estoqueService = estoqueService;
         this.pedidoProducer = pedidoProducer;
     }
 
@@ -46,21 +46,20 @@ public class PedidoService {
     }
 
     public PedidoResponse obterPorId(Long pedidoId) {
-        return PedidoResponse.of(tentaObterPedido(pedidoId));
+        return PedidoResponse.of(obterPedidoOuExcecao(pedidoId));
     }
 
     @Transactional
     public PedidoResponse criarPedido(PedidoRequest request) {
 
         // validar usuário
-        Usuario usuario = tentaObterUsuario(request.usuarioId());
+        Usuario usuario = usuarioService.obterUsuarioOuExcecao(request.usuarioId());
 
         Pedido novoPedido = Pedido.criarPedido(usuario);
 
         List<PedidoItem> pedidoItens = request.itens().stream()
                 .map(itemRequest -> {
-                    Produto produto = produtoRepository
-                            .findById(itemRequest.produtoId())
+                    Produto produto = produtoService.obterProduto(itemRequest.produtoId())
                             .orElse(null);
 
                     return PedidoItem.criarItemPedidoCriadoOuCancelado(
@@ -82,7 +81,7 @@ public class PedidoService {
     public PedidoResponse validarPedido(Long pedidoId) {
 
         //validar pedido
-        Pedido pedido = tentaObterPedido(pedidoId);
+        Pedido pedido = obterPedidoOuExcecao(pedidoId);
 
         pedido.alterarStatusValidado();
 
@@ -96,7 +95,7 @@ public class PedidoService {
     public PedidoResponse cancelarPedido(Long pedidoId, CancelarPedidoRequest request) {
 
         //validar pedido
-        Pedido pedido = tentaObterPedido(pedidoId);
+        Pedido pedido = obterPedidoOuExcecao(pedidoId);
 
         UserPrincipal usuarioLogado = obterUsuarioLogado();
         final String mensagemCompleto = "Id Usuario Cancelamento: %s, Motivo do cancelamento: %s"
@@ -114,12 +113,11 @@ public class PedidoService {
     @Transactional
     public synchronized Pedido reservarEstoquePedido(Long pedidoId) {
 
-        Pedido pedido = tentaObterPedido(pedidoId);
+        Pedido pedido = obterPedidoOuExcecao(pedidoId);
 
         for (PedidoItem item : pedido.getItens().stream().filter(i -> i.getStatusItem() == StatusPedidoItem.VALIDADO).toList()) {
 
-            final Integer estoqueAtual = produtoEstoqueAtualViewRepository
-                    .findById(item.getProduto().getId())
+            final Integer estoqueAtual = estoqueService.obterProdutoEstoqueAtualView(item.getProduto().getId())
                     .map(ProdutoEstoqueAtualView::getQuantidadeEstoque)
                     .orElse(0);
 
@@ -140,14 +138,13 @@ public class PedidoService {
         return pedido;
     }
 
-    private Pedido tentaObterPedido(Long pedidoId) {
-        return pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: %s".formatted(pedidoId)));
+    public Optional<Pedido> obterPedido(Long pedidoId) {
+        return pedidoRepository.findById(pedidoId);
     }
 
-    private Usuario tentaObterUsuario(Long usuarioId) {
-        return usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado: %s".formatted(usuarioId)));
+    public Pedido obterPedidoOuExcecao(Long pedidoId) {
+        return this.obterPedido(pedidoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: %s".formatted(pedidoId)));
     }
 
     private UserPrincipal obterUsuarioLogado() {

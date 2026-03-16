@@ -1,4 +1,4 @@
-package com.stefano.pedidos.endpoints.produtos.entity;
+package com.stefano.pedidos.endpoints.estoques.entity;
 
 import java.util.Arrays;
 import java.util.Set;

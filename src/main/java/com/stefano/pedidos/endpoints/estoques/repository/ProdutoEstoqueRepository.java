@@ -1,6 +1,6 @@
-package com.stefano.pedidos.endpoints.produtos.repository;
+package com.stefano.pedidos.endpoints.estoques.repository;
 
-import com.stefano.pedidos.endpoints.produtos.entity.ProdutoEstoque;
+import com.stefano.pedidos.endpoints.estoques.entity.ProdutoEstoque;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

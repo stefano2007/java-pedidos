@@ -1,6 +1,6 @@
-package com.stefano.pedidos.endpoints.produtos.validation.annotation;
+package com.stefano.pedidos.endpoints.estoques.validation.annotation;
 
-import com.stefano.pedidos.endpoints.produtos.validation.validator.StatusConferenciaValidator;
+import com.stefano.pedidos.endpoints.estoques.validation.validator.StatusConferenciaValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;

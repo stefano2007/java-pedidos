@@ -1,4 +1,4 @@
-package com.stefano.pedidos.endpoints.produtos.entity;
+package com.stefano.pedidos.endpoints.estoques.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.Immutable;
@@ -12,6 +12,8 @@ public class ProdutoEstoqueAtualView {
     @Column(name = "produto_id")
     private Long produtoId;
 
+    @Column(name = "nome")
+    private String nomeProduto;
 
     @Column(name = "quantidade_estoque")
     private Integer quantidadeEstoque;
@@ -20,7 +22,12 @@ public class ProdutoEstoqueAtualView {
         return produtoId;
     }
 
+    public String getNomeProduto() {
+        return nomeProduto;
+    }
+
     public Integer getQuantidadeEstoque() {
         return quantidadeEstoque;
     }
+
 }

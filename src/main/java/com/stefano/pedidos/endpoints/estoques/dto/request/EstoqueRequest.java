@@ -1,6 +1,6 @@
-package com.stefano.pedidos.endpoints.produtos.dto.request;
+package com.stefano.pedidos.endpoints.estoques.dto.request;
 
-import com.stefano.pedidos.endpoints.produtos.entity.TipoMovimentacaoEstoque;
+import com.stefano.pedidos.endpoints.estoques.entity.TipoMovimentacaoEstoque;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.util.List;
 
-public record ProdutoEstoqueRequest(
+public record EstoqueRequest(
 
         @NotNull(message = "Usuário é obrigatório")
         @Positive(message = "Usuário inválido")

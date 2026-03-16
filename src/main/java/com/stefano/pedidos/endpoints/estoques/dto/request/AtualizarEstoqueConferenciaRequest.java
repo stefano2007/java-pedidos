@@ -1,6 +1,6 @@
-package com.stefano.pedidos.endpoints.produtos.dto.request;
+package com.stefano.pedidos.endpoints.estoques.dto.request;
 
-import com.stefano.pedidos.endpoints.produtos.validation.annotation.StatusConferenciaValido;
+import com.stefano.pedidos.endpoints.estoques.validation.annotation.StatusConferenciaValido;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.List;
 
-public record AtualizarProdutoEstoqueConferenciaRequest(
+public record AtualizarEstoqueConferenciaRequest(
         @NotNull(message = "Usuário é obrigatório")
         @Positive(message = "Usuário inválido")
         Long usuarioId,

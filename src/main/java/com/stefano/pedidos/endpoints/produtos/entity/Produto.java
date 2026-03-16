@@ -1,13 +1,14 @@
 package com.stefano.pedidos.endpoints.produtos.entity;
 
-import com.stefano.pedidos.endpoints.pedidos.entity.PedidoItem;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
 @Table(name = "PRODUTOS")
+@SQLRestriction("ativo = true")
 public class Produto {
 
     @Id
@@ -29,9 +30,6 @@ public class Produto {
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "produto")
-    private List<PedidoItem> itens;
-
     protected Produto() {}
 
     public static Produto criarProduto(String nome, String descricao, BigDecimal preco){
@@ -45,6 +43,10 @@ public class Produto {
         }
 
         return  novoProduto;
+    }
+
+    public void inativar() {
+        this.ativo = false;
     }
 
     public Long getId() {
@@ -71,7 +73,4 @@ public class Produto {
         return dataCriacao;
     }
 
-    public List<PedidoItem> getItens() {
-        return itens;
-    }
 }

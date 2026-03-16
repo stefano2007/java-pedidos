@@ -1,5 +1,6 @@
-package com.stefano.pedidos.endpoints.produtos.entity;
+package com.stefano.pedidos.endpoints.estoques.entity;
 
+import com.stefano.pedidos.endpoints.produtos.entity.Produto;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import jakarta.persistence.*;
 

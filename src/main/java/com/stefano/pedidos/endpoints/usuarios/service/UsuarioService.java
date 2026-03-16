@@ -48,13 +48,16 @@ public class UsuarioService {
     }
 
     public UsuarioResponse obterPorId(Long usuarioId) {
-        return usuarioRepository.findById(usuarioId)
-                .map(UsuarioResponse::of)
-                .orElseThrow(() ->
-                        new RecursoNaoEncontradoException("Usuário não encontrado"));
+        return UsuarioResponse.of(obterUsuarioOuExcecao(usuarioId));
     }
 
     private Optional<Usuario> obterPorEmail(String email){
         return usuarioRepository.findByEmail(email);
+    }
+
+    public Usuario obterUsuarioOuExcecao(Long usuarioId) {
+        return usuarioRepository.findById(usuarioId)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException("Usuário não encontrado: %s".formatted(usuarioId)));
     }
 }

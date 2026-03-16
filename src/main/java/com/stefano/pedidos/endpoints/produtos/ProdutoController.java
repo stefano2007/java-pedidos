@@ -1,20 +1,15 @@
 package com.stefano.pedidos.endpoints.produtos;
 
-import com.stefano.pedidos.endpoints.produtos.dto.request.AtualizarProdutoEstoqueConferenciaRequest;
-import com.stefano.pedidos.endpoints.produtos.dto.request.ProdutoEstoqueRequest;
 import com.stefano.pedidos.endpoints.produtos.dto.request.ProdutoRequest;
-import com.stefano.pedidos.endpoints.produtos.dto.response.ProdutoEstoqueResponse;
 import com.stefano.pedidos.endpoints.produtos.dto.response.ProdutoResponse;
 import com.stefano.pedidos.endpoints.produtos.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/produtos")
@@ -47,30 +42,11 @@ public class ProdutoController {
         return ResponseEntity.ok().body(produtoResponse);
     }
 
-    @GetMapping("{produtoId}/estoque")
-    public ResponseEntity<List<ProdutoEstoqueResponse>> obterEstoquePorId(
-            @PathVariable("produtoId") Long produtoId) {
-        List<ProdutoEstoqueResponse> produtosEstoqueResponse = produtoService.obterEstoquePorId(produtoId);
-        return ResponseEntity.ok().body(produtosEstoqueResponse);
-    }
+    @PatchMapping("{produtoId}/inativar")
+    public ResponseEntity<Void> inativarProduto(@PathVariable("produtoId") Long produtoId) {
 
-    @GetMapping("estoque")
-    public ResponseEntity<Page<ProdutoEstoqueResponse>> obterObterTodosEstoque(
-            @PageableDefault(size = 20, sort = "dataCriacao", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        Page<ProdutoEstoqueResponse> produtosEstoqueResponse = produtoService.obterObterTodosEstoque(pageable);
-        return ResponseEntity.ok().body(produtosEstoqueResponse);
-    }
+        produtoService.inativarProduto(produtoId);
 
-    @PostMapping("/estoque")
-    public ResponseEntity<List<ProdutoEstoqueResponse>> criarEstoque(@Valid @RequestBody ProdutoEstoqueRequest request) {
-        List<ProdutoEstoqueResponse> produtosEstoqueResponse = produtoService.criarEstoque(request);
-        return ResponseEntity.ok().body(produtosEstoqueResponse);
-    }
-
-    @PutMapping("/estoque")
-    public ResponseEntity<List<ProdutoEstoqueResponse>> atualizarEstoque(@Valid @RequestBody AtualizarProdutoEstoqueConferenciaRequest request) {
-        List<ProdutoEstoqueResponse> produtosEstoqueResponse = produtoService.atualizarEstoque(request);
-        return ResponseEntity.ok().body(produtosEstoqueResponse);
+        return ResponseEntity.noContent().build();
     }
 }
