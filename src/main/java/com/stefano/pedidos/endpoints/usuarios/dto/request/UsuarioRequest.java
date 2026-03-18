@@ -1,7 +1,9 @@
 package com.stefano.pedidos.endpoints.usuarios.dto.request;
 
 import com.stefano.pedidos.endpoints.usuarios.validation.annotation.SenhaValida;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record UsuarioRequest(
 

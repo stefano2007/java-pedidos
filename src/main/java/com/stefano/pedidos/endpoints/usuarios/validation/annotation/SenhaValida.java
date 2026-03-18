@@ -3,6 +3,7 @@ package com.stefano.pedidos.endpoints.usuarios.validation.annotation;
 import com.stefano.pedidos.endpoints.usuarios.validation.validator.SenhaValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+
 import java.lang.annotation.*;
 
 @Target({ElementType.FIELD})

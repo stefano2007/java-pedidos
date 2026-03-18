@@ -3,8 +3,8 @@ package com.stefano.pedidos.endpoints.produtos.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PRODUTOS")

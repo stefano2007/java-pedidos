@@ -1,8 +1,8 @@
 package com.stefano.pedidos.endpoints.estoques.dto.response;
 
-import com.stefano.pedidos.endpoints.estoques.entity.TipoMovimentacaoEstoque;
 import com.stefano.pedidos.endpoints.estoques.entity.ProdutoEstoque;
 import com.stefano.pedidos.endpoints.estoques.entity.StatusEstoque;
+import com.stefano.pedidos.endpoints.estoques.entity.TipoMovimentacaoEstoque;
 import com.stefano.pedidos.endpoints.produtos.dto.response.ProdutoResponse;
 import com.stefano.pedidos.endpoints.usuarios.dto.response.UsuarioResponse;
 

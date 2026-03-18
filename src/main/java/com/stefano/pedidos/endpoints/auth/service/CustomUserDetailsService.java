@@ -3,7 +3,6 @@ package com.stefano.pedidos.endpoints.auth.service;
 import com.stefano.pedidos.config.model.UserPrincipal;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

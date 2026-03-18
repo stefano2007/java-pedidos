@@ -1,12 +1,12 @@
 package com.stefano.pedidos.endpoints.usuarios.service;
 
-import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
-import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
-import com.stefano.pedidos.endpoints.usuarios.exception.SenhaInvalidaException;
-import com.stefano.pedidos.endpoints.usuarios.exception.UsuarioJaExisteException;
 import com.stefano.pedidos.endpoints.usuarios.dto.request.UsuarioRequest;
 import com.stefano.pedidos.endpoints.usuarios.dto.response.UsuarioResponse;
+import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
+import com.stefano.pedidos.endpoints.usuarios.exception.SenhaInvalidaException;
+import com.stefano.pedidos.endpoints.usuarios.exception.UsuarioJaExisteException;
 import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
+import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;

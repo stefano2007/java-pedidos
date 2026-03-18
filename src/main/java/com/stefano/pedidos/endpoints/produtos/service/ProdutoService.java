@@ -1,10 +1,10 @@
 package com.stefano.pedidos.endpoints.produtos.service;
 
-import com.stefano.pedidos.endpoints.produtos.entity.Produto;
-import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
 import com.stefano.pedidos.endpoints.produtos.dto.request.ProdutoRequest;
 import com.stefano.pedidos.endpoints.produtos.dto.response.ProdutoResponse;
+import com.stefano.pedidos.endpoints.produtos.entity.Produto;
 import com.stefano.pedidos.endpoints.produtos.repository.ProdutoRepository;
+import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

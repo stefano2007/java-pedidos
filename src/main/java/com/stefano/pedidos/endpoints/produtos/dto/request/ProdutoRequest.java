@@ -1,8 +1,8 @@
 package com.stefano.pedidos.endpoints.produtos.dto.request;
 
-import java.math.BigDecimal;
-
 import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
 
 public record ProdutoRequest(
 

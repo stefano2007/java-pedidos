@@ -1,18 +1,20 @@
 package com.stefano.pedidos.endpoints.pedidos.service;
 
 import com.stefano.pedidos.config.model.UserPrincipal;
+import com.stefano.pedidos.endpoints.estoques.entity.ProdutoEstoqueAtualView;
 import com.stefano.pedidos.endpoints.estoques.service.EstoqueService;
 import com.stefano.pedidos.endpoints.pedidos.dto.request.CancelarPedidoRequest;
-import com.stefano.pedidos.endpoints.pedidos.entity.*;
+import com.stefano.pedidos.endpoints.pedidos.dto.request.PedidoRequest;
+import com.stefano.pedidos.endpoints.pedidos.dto.response.PedidoResponse;
+import com.stefano.pedidos.endpoints.pedidos.entity.Pedido;
+import com.stefano.pedidos.endpoints.pedidos.entity.PedidoItem;
+import com.stefano.pedidos.endpoints.pedidos.entity.StatusPedidoItem;
+import com.stefano.pedidos.endpoints.pedidos.repository.PedidoRepository;
 import com.stefano.pedidos.endpoints.produtos.entity.Produto;
-import com.stefano.pedidos.endpoints.estoques.entity.ProdutoEstoqueAtualView;
 import com.stefano.pedidos.endpoints.produtos.service.ProdutoService;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.endpoints.usuarios.service.UsuarioService;
 import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
-import com.stefano.pedidos.endpoints.pedidos.dto.request.PedidoRequest;
-import com.stefano.pedidos.endpoints.pedidos.dto.response.PedidoResponse;
-import com.stefano.pedidos.endpoints.pedidos.repository.PedidoRepository;
 import com.stefano.pedidos.kafka.producer.PedidoProducer;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;

@@ -2,6 +2,7 @@ package com.stefano.pedidos.endpoints.usuarios.entity;
 
 import com.stefano.pedidos.endpoints.pedidos.entity.Pedido;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 

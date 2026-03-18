@@ -3,6 +3,7 @@ package com.stefano.pedidos.endpoints.usuarios.validation.validator;
 import com.stefano.pedidos.endpoints.usuarios.validation.annotation.SenhaValida;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
 import java.util.regex.Pattern;
 
 public class SenhaValidator implements ConstraintValidator<SenhaValida, String> {
