@@ -1,0 +1,791 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1772496915306
+  modified: 1772496915306
+  description: ""
+collection:
+  - name: Usuarios
+    meta:
+      id: fld_9b607c255ba04f25ac04afc1fd82ac49
+      created: 1772732047533
+      modified: 1772732047533
+      sortKey: -1772732047534
+      description: ""
+    children:
+      - url: http://localhost:9080/usuarios
+        name: Usuario - Criar
+        meta:
+          id: req_341610560a7347ea8bc0bb5c56a8e0fe
+          created: 1772555568284
+          modified: 1773602490425
+          isPrivate: false
+          description: ""
+          sortKey: -1772732053483
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nome": "teste",
+            	"email": "teste@teste.com",
+            	"senha": "St@123456",
+            	"confirmacaoSenha": "St@123456"
+            }	
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/usuarios
+        name: Usuario - ObterTodos
+        meta:
+          id: req_2c535bb555334694be56d2f97a0ba61e
+          created: 1772558764949
+          modified: 1773603238138
+          isPrivate: false
+          description: ""
+          sortKey: -1772732053583
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/usuarios/1
+        name: Usuario - PorId
+        meta:
+          id: req_fcb074f3eeeb4482a0e5e2ed824bcb55
+          created: 1772558811794
+          modified: 1773603226134
+          isPrivate: false
+          description: ""
+          sortKey: -1772732053683
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Pedido
+    meta:
+      id: fld_007315e60a7541b7b13160e7f9584e4e
+      created: 1772732073087
+      modified: 1772732073087
+      sortKey: -1772732073087
+      description: ""
+    children:
+      - url: http://localhost:9080/pedidos
+        name: 00 Pedido - Criar
+        meta:
+          id: req_fbd66b261a9f4ceab68799c518ffc2ad
+          created: 1772496961314
+          modified: 1773603275104
+          isPrivate: false
+          description: ""
+          sortKey: -1772732145970
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"usuarioId": 1,
+            	"itens": [
+            		{
+            			"produtoId": 1,
+            			"quantidade": 1
+            		},
+            		{
+            			"produtoId": 2,
+            			"quantidade": 10
+            		}
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/pedidos
+        name: Pedidos - ObterTodos
+        meta:
+          id: req_4cf94074d322483683b7e1ce5dfaff03
+          created: 1772500076478
+          modified: 1773603266577
+          isPrivate: false
+          description: ""
+          sortKey: -1772732146020
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/pedidos/2
+        name: Pedido  - PorId
+        meta:
+          id: req_7851d42d195f4c05935e7b3cca598b7e
+          created: 1772561360239
+          modified: 1773608897977
+          isPrivate: false
+          description: ""
+          sortKey: -1772732146070
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/pedidos/1/validar
+        name: 01 Validar Pedido - Criar
+        meta:
+          id: req_f634fa53a1444382bce79e90d506c77e
+          created: 1772728155697
+          modified: 1773608369685
+          isPrivate: false
+          description: ""
+          sortKey: -1772732145945
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"usuarioId": 1
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/pedidos/2/cancelar
+        name: 99 Cancelar  Pedido - Criar
+        meta:
+          id: req_6a7171c3b5294aa0ac09e7ff03f74cf6
+          created: 1773608359749
+          modified: 1773608415780
+          isPrivate: false
+          description: ""
+          sortKey: -1772732099814
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"motivoCancelamento": "Pedido criado por engano"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Produtos
+    meta:
+      id: fld_4596547d490b42eeb751cbf27e67256e
+      created: 1772732201543
+      modified: 1773675950997
+      sortKey: -1772673275921.1875
+      description: ""
+    children:
+      - url: http://localhost:9080/produtos/10002
+        name: Produto  - PorId
+        meta:
+          id: req_dfc0d94eac5d427f99e9f89a24984843
+          created: 1772561384670
+          modified: 1773679659479
+          isPrivate: false
+          description: ""
+          sortKey: -1772732228613
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/produtos
+        name: Produto  - Criar
+        meta:
+          id: req_d062aa7624254241a445bfc177446c24
+          created: 1772561397971
+          modified: 1773679637692
+          isPrivate: false
+          description: ""
+          sortKey: -1772732228713
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "nome": "XPTO",
+                "descricao": "Um produto qualquer de teste",
+                "preco": 249.90
+              }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/produtos
+        name: Produto  - ObterTodos
+        meta:
+          id: req_c12383e7bab24063bd5182667fbeb129
+          created: 1772746495935
+          modified: 1773603179042
+          isPrivate: false
+          description: ""
+          sortKey: -1772732187341.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/produtos/10002/inativar
+        name: "99 - Inativar - Produto "
+        meta:
+          id: req_d38d64de687f4600995179f73fc77f4e
+          created: 1773679703696
+          modified: 1773679745786
+          isPrivate: false
+          description: ""
+          sortKey: -1772732166705.75
+        method: PATCH
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Estoque
+    meta:
+      id: fld_c68135be95aa46baa592b9d8f679db46
+      created: 1772732273559
+      modified: 1773675944853
+      sortKey: -1772614504308.375
+      description: ""
+    children:
+      - url: http://localhost:9080/estoques/10/produto
+        name: ProdutoEstoque  - PorId
+        meta:
+          id: req_bcf6d8018fb845f8b3b888d9f03cc4cd
+          created: 1772654883002
+          modified: 1773683631963
+          isPrivate: false
+          description: ""
+          sortKey: -1772732290042.75
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/estoques
+        name: Produto Estoque - Criar
+        meta:
+          id: req_63e74dcc39dc4f8b8e4631c607936ae0
+          created: 1772657512571
+          modified: 1773676677901
+          isPrivate: false
+          description: ""
+          sortKey: -1772732289999
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"usuarioId": 1,
+            	"itens": [
+            		{
+            			"produtoId": 1,
+            			"quantidade": 443,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 2,
+            			"quantidade": 412,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 3,
+            			"quantidade": 362,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 4,
+            			"quantidade": 90,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 5,
+            			"quantidade": 237,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 6,
+            			"quantidade": 68,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 7,
+            			"quantidade": 116,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 8,
+            			"quantidade": 278,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 9,
+            			"quantidade": 87,
+            			"tipo": "ENTRADA"
+            		},
+            		{
+            			"produtoId": 10,
+            			"quantidade": 439,
+            			"tipo": "ENTRADA"
+            		}
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/estoques
+        name: ProdutoEstoque  - ObterTodos
+        meta:
+          id: req_e8b1be7f99dd4b5c8110a1ebe62af6c3
+          created: 1772658119540
+          modified: 1773676640823
+          isPrivate: false
+          description: ""
+          sortKey: -1772732290049
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/estoques/conferencia
+        name: Produto Estoque - Conferir
+        meta:
+          id: req_3f7560b296294fff93082d334a2a3dac
+          created: 1772658183610
+          modified: 1773676848139
+          isPrivate: false
+          description: ""
+          sortKey: -1772732289974
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"usuarioId": 1,
+            	"itens": [
+            		{
+            			"produtoEstoqueId": 1,
+            			"quantidadeConferida": 443,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 2,
+            			"quantidadeConferida": 412,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 3,
+            			"quantidadeConferida": 362,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 4,
+            			"quantidadeConferida": 90,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 5,
+            			"quantidadeConferida": 237,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 6,
+            			"quantidadeConferida": 68,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 7,
+            			"quantidadeConferida": 116,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 8,
+            			"quantidadeConferida": 278,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 9,
+            			"quantidadeConferida": 87,
+            			"statusEstoque": "CONFERIDO"
+            		},
+            		{
+            			"produtoEstoqueId": 10,
+            			"quantidadeConferida": 439,
+            			"statusEstoque": "CONFERIDO"
+            		}
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/estoques/saldo-atual
+        name: ProdutoEstoque  - SaldoAtual
+        meta:
+          id: req_e842787135b949839e037af163f48443
+          created: 1773683574010
+          modified: 1773683580394
+          isPrivate: false
+          description: ""
+          sortKey: -1772732290036.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/estoques/10/produto-saldo-atual
+        name: ProdutoEstoque  - ProdutoSaldoAtual
+        meta:
+          id: req_66a27a197f3d492b9a24c3f1672fd767
+          created: 1773683621577
+          modified: 1773683670792
+          isPrivate: false
+          description: ""
+          sortKey: -1772732290030.25
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_b38d2f9529664a0cada858363b71b955',
+            'b64::JC5hY2Nlc3NUb2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Auth
+    meta:
+      id: fld_ed87c76fbbb5465c94294e03c2237238
+      created: 1773082780475
+      modified: 1773082780475
+      sortKey: -1773082780475
+      description: ""
+    children:
+      - url: http://localhost:9080/auth/login
+        name: Login
+        meta:
+          id: req_b38d2f9529664a0cada858363b71b955
+          created: 1773082792345
+          modified: 1773602617640
+          isPrivate: false
+          description: ""
+          sortKey: -1773082792345
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email": "teste@teste.com",
+            	"senha": "St@123456"
+            }	
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:9080/auth/refresh
+        name: reflesh token
+        meta:
+          id: req_a34b62eac7194187b8dfd113bbb95d87
+          created: 1773086357906
+          modified: 1773607905216
+          isPrivate: false
+          description: ""
+          sortKey: -1772907541197
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZUB0ZXN0ZS5jb20iLCJpYXQiOjE3NzM2MDc4NjEsImV4cCI6MTc3NDIxMjY2MX0.emU_I-o8NPI5Oc677MpTFtpClXNDQlduEzkJFwbO2SQ"
+            }	
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.1
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1772496938233
+    modified: 1773683516819
+  cookies:
+    - id: cc7a2923-f8b6-4319-a0c6-b1a986753fe1
+      key: JSESSIONID
+      value: 202988BEEA26A7E50D07B2FD74C52441
+      domain: localhost
+      path: /
+      secure: false
+      httpOnly: true
+      hostOnly: true
+environments:
+  name: Base Environment
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1772496938227
+    modified: 1772496938227
+    isPrivate: false
