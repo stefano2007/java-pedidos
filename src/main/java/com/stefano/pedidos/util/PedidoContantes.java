@@ -7,6 +7,7 @@ public class PedidoContantes {
     }
 
     public static final String PERSON_ID_TOKEN = "personId";
+    public static final String ROLES_TOKEN = "roles";
 
     public static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
     public static final String SESSION_ID_HEADER = "X-Session-ID";

@@ -5,16 +5,19 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import static com.stefano.pedidos.util.PedidoContantes.PERSON_ID_TOKEN;
+import static com.stefano.pedidos.util.PedidoContantes.ROLES_TOKEN;
 
 @Service
 public class JwtService {
@@ -31,8 +34,7 @@ public class JwtService {
 
     public String gerarAccessToken(UserPrincipal user) {
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(PERSON_ID_TOKEN, user.getUsuarioId());
+        Map<String, Object> claims = montarClaims(user);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -41,6 +43,22 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
                 .signWith(getSignKey())
                 .compact();
+    }
+
+    public Map<String, Object> montarClaims(UserPrincipal user) {
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put(PERSON_ID_TOKEN, user.getUsuarioId());
+
+        List<String> roles = user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        if (!roles.isEmpty()) {
+            claims.put(ROLES_TOKEN, roles);
+        }
+
+        return claims;
     }
 
     public String gerarRefreshToken(UserDetails user) {

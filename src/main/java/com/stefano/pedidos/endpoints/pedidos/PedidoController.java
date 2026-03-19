@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -50,6 +51,7 @@ public class PedidoController {
     }
 
     @PostMapping("{pedidoId}/cancelar")
+    @PreAuthorize("hasRole('ROLE_GERENCIADOR')")
     public ResponseEntity<PedidoResponse> validarPedido(@PathVariable("pedidoId") Long pedidoId, @Valid @RequestBody CancelarPedidoRequest request) {
         PedidoResponse pedidoResponse = pedidoService.cancelarPedido(pedidoId, request);
         return ResponseEntity.ok().body(pedidoResponse);

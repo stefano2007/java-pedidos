@@ -4,7 +4,9 @@ import com.stefano.pedidos.endpoints.pedidos.entity.Pedido;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "USUARIOS")
@@ -32,13 +34,28 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario")
     private List<Pedido> pedidos;
 
+    // E adicione este campo na classe Usuario (após o campo 'ativo'):
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "usuario_roles",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    // Adicione estes getters:
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
     protected Usuario() {}
 
-    public static Usuario criarUsuario(String nome, String email, String senha){
+    public static Usuario criarUsuario(String nome, String email, String senha, Role role){
         Usuario novoUsuario = new Usuario();
         novoUsuario.nome = nome;
         novoUsuario.email = email;
         novoUsuario.senha = senha;
+        novoUsuario.roles.add(role);
         return novoUsuario;
     }
 

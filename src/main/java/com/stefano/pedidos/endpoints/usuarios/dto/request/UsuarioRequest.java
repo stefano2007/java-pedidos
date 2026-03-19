@@ -19,4 +19,5 @@ public record UsuarioRequest(
         String senha,
 
         String confirmacaoSenha
-) {}
+) {
+}

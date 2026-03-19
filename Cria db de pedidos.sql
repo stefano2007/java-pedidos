@@ -11,6 +11,28 @@ CREATE TABLE USUARIOS (
     ativo BIT DEFAULT 1
 );
 GO
+CREATE TABLE ROLES (
+    id BIGINT IDENTITY PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL UNIQUE,
+    descricao VARCHAR(255),
+    ativo BIT NOT NULL DEFAULT 1
+);
+GO
+CREATE TABLE USUARIO_ROLES (
+    usuario_id BIGINT NOT NULL,
+    role_id BIGINT NOT NULL,
+
+    PRIMARY KEY (usuario_id, role_id),
+
+    CONSTRAINT FK_USUARIO_ROLES_USUARIO
+        FOREIGN KEY (usuario_id)
+        REFERENCES USUARIOS(id) ON DELETE CASCADE,
+
+    CONSTRAINT FK_USUARIO_ROLES_ROLE
+        FOREIGN KEY (role_id)
+        REFERENCES ROLES(id) ON DELETE CASCADE
+);
+GO
 CREATE TABLE PRODUTOS (
     id        BIGINT IDENTITY PRIMARY KEY,
     nome      VARCHAR(150) NOT NULL,
@@ -128,4 +150,10 @@ SELECT
 
 GO
 
-SELECT * FROM VW_PRODUTO_ESTOQUE_ATUAL
+-- Inserir as roles padrão do sistema
+INSERT INTO ROLES (nome, descricao, ativo)
+VALUES
+    ('ROLE_ADMIN', 'Administrador do sistema - Acesso total', 1),
+    ('ROLE_GERENCIADOR', 'Gerenciador de pedidos - Gerencia pedidos e estoque', 1),
+    ('ROLE_USER', 'Usuário comum - Acesso básico', 1);
+GO

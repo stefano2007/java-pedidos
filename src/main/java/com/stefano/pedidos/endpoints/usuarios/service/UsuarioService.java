@@ -1,7 +1,9 @@
 package com.stefano.pedidos.endpoints.usuarios.service;
 
+import com.stefano.pedidos.config.model.RolesUsuario;
 import com.stefano.pedidos.endpoints.usuarios.dto.request.UsuarioRequest;
 import com.stefano.pedidos.endpoints.usuarios.dto.response.UsuarioResponse;
+import com.stefano.pedidos.endpoints.usuarios.entity.Role;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.endpoints.usuarios.exception.SenhaInvalidaException;
 import com.stefano.pedidos.endpoints.usuarios.exception.UsuarioJaExisteException;
@@ -18,10 +20,12 @@ import java.util.Optional;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, RoleService roleService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleService = roleService;
     }
 
     public UsuarioResponse criar(UsuarioRequest request) {
@@ -33,9 +37,13 @@ public class UsuarioService {
             throw new UsuarioJaExisteException("Usuário já existe");
         }
 
-        String senhaCriptografada = passwordEncoder.encode(request.senha());
+        final String senhaCriptografada = passwordEncoder.encode(request.senha());
 
-        Usuario novoUsuario = Usuario.criarUsuario(request.nome(), request.email(), senhaCriptografada);
+        //criar o usuario com usuario comum
+        //Todo: da opção de criar um usuário com role admin, mas só pode ser feito por um admin
+        Role roleUser = roleService.obterRolePorNome(RolesUsuario.USER.getNome());
+
+        Usuario novoUsuario = Usuario.criarUsuario(request.nome(), request.email(), senhaCriptografada, roleUser);
         usuarioRepository.save(novoUsuario);
 
         return UsuarioResponse.of(novoUsuario);
