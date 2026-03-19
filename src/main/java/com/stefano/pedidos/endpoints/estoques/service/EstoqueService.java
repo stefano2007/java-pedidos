@@ -48,7 +48,7 @@ public class EstoqueService {
                 .toList();
     }
 
-    public Page<EstoqueResponse> obterObterTodosEstoque(
+    public Page<EstoqueResponse> obterTodosEstoque(
             Pageable pageable
     ) {
         return produtoEstoqueRepository

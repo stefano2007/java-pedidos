@@ -26,10 +26,10 @@ public class EstoqueController {
     }
 
     @GetMapping()
-    public ResponseEntity<Page<EstoqueResponse>> obterObterTodosEstoque(
+    public ResponseEntity<Page<EstoqueResponse>> obterTodosEstoque(
             @PageableDefault(size = 20, sort = "dataCriacao", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<EstoqueResponse> produtosEstoqueResponse = estoqueService.obterObterTodosEstoque(pageable);
+        Page<EstoqueResponse> produtosEstoqueResponse = estoqueService.obterTodosEstoque(pageable);
         return ResponseEntity.ok().body(produtosEstoqueResponse);
     }
 

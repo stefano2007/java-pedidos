@@ -1,6 +1,7 @@
 package com.stefano.pedidos.config;
 
 import com.stefano.pedidos.config.filter.JwtFilter;
+import com.stefano.pedidos.config.filter.LoggingContextFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,9 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SeguracaConfig {
 
     private final JwtFilter jwtFilter;
+    private final LoggingContextFilter loggingContextFilter;
 
-    public SeguracaConfig(JwtFilter jwtFilter) {
+    public SeguracaConfig(JwtFilter jwtFilter, LoggingContextFilter loggingContextFilter) {
         this.jwtFilter = jwtFilter;
+        this.loggingContextFilter = loggingContextFilter;
     }
 
     @Bean
@@ -34,7 +37,8 @@ public class SeguracaConfig {
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(loggingContextFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

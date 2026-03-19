@@ -12,87 +12,86 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
+import static com.stefano.pedidos.util.PedidoContantes.PERSON_ID_TOKEN;
+
 @Service
-    public class JwtService {
+public class JwtService {
 
-        @Value("${seguraca.jwt.secret}")
-        private String jwtSecret;
+    @Value("${seguraca.jwt.secret}")
+    private String jwtSecret;
 
-        private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15; // 15 minutos
-        private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7 dias
+    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15; // 15 minutos
+    private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7 dias
 
-        private Key getSignKey() {
-            return Keys.hmacShaKeyFor(jwtSecret.getBytes());
-        }
-
-        public String gerarAccessToken(UserPrincipal user) {
-
-            Map<String, Object> claims = new HashMap<>();
-
-            claims.put("usuarioId", user.getUsuarioId());
-            claims.put("sessionId", UUID.randomUUID());
-
-            return Jwts.builder()
-                    .setClaims(claims)
-                    .setSubject(user.getUsername())
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
-                    .signWith(getSignKey())
-                    .compact();
-        }
-
-        public String gerarRefreshToken(UserDetails user) {
-            return Jwts.builder()
-                    .setSubject(user.getUsername())
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
-                    .signWith(getSignKey())
-                    .compact();
-        }
-
-        public String extrairUsuario(String token) {
-
-            return Jwts.parserBuilder()
-                    .setSigningKey(jwtSecret.getBytes())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
-        }
-
-        public boolean isTokenValid(String token, UserDetails userDetails) {
-
-            final String username = extrairUsuario(token);
-
-            return username.equals(userDetails.getUsername())
-                    && !isTokenExpired(token);
-        }
-
-        private boolean isTokenExpired(String token) {
-            return extractExpiration(token).before(new Date());
-        }
-
-        private Date extractExpiration(String token) {
-            return extractClaim(token, Claims::getExpiration);
-        }
-
-        // MÉTODO GENÉRICO PARA EXTRAIR CLAIM
-        public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-
-            final Claims claims = extractAllClaims(token);
-            return claimsResolver.apply(claims);
-        }
-
-        // EXTRAI TODAS AS CLAIMS DO TOKEN
-        private Claims extractAllClaims(String token) {
-
-            return Jwts.parserBuilder()
-                    .setSigningKey(getSignKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        }
+    private Key getSignKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
+
+    public String gerarAccessToken(UserPrincipal user) {
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(PERSON_ID_TOKEN, user.getUsuarioId());
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
+                .signWith(getSignKey())
+                .compact();
+    }
+
+    public String gerarRefreshToken(UserDetails user) {
+        return Jwts.builder()
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
+                .signWith(getSignKey())
+                .compact();
+    }
+
+    public String extrairUsuario(String token) {
+
+        return Jwts.parserBuilder()
+                .setSigningKey(jwtSecret.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+
+        final String username = extrairUsuario(token);
+
+        return username.equals(userDetails.getUsername())
+                && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    // MÉTODO GENÉRICO PARA EXTRAIR CLAIM
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    // EXTRAI TODAS AS CLAIMS DO TOKEN
+    private Claims extractAllClaims(String token) {
+
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+}

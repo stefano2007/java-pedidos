@@ -6,12 +6,15 @@ import com.stefano.pedidos.kafka.constants.KafkaTopics;
 import com.stefano.pedidos.kafka.event.PedidoEvent;
 import com.stefano.pedidos.kafka.producer.PedidoProducer;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ReservaEstoqueWorker {
 
+    private static final Logger logger = LoggerFactory.getLogger(ReservaEstoqueWorker.class);
     private final PedidoService pedidoService;
     private final PedidoProducer pedidoProducer;
 
@@ -27,7 +30,6 @@ public class ReservaEstoqueWorker {
 
         pedidoProducer.publicar(pedido);
 
-        //todo: adicionar logger
-        System.out.println("Topico processado %s para o pedido %d, status atual %s".formatted(KafkaTopics.PEDIDO_VALIDADO, pedido.getId(), pedido.getStatus()));
+        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", KafkaTopics.PEDIDO_VALIDADO, pedido.getId(), pedido.getStatus());
     }
 }

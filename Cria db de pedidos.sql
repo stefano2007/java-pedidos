@@ -88,11 +88,12 @@ go
 CREATE VIEW VW_PRODUTO_ESTOQUE_ATUAL AS 
 SELECT
    P.id as produto_id,
+   p.nome as nome,
    SUM(PE.quantidade_estoque) as quantidade_estoque
-   FROM PRODUTOS AS P 
-   INNER JOIN (   
+   FROM PRODUTOS AS P
+   INNER JOIN (
    -- (+) Entradas
-   SELECT 
+   SELECT
         PPE.produto_id,
         ISNULL(PPE.quantidade_estoque, 0) AS quantidade_estoque
       FROM PRODUTOS_ESTOQUE AS PPE
@@ -102,17 +103,17 @@ SELECT
     UNION ALL
 
    -- (-) Saidas
-    SELECT 
+    SELECT
         PPE.produto_id,
         ISNULL(PPE.quantidade_estoque, 0) * -1 AS quantidade_estoque
       from PRODUTOS_ESTOQUE AS PPE
       WHERE PPE.status_estoque = 'CONFERIDO'
-        AND PPE.tipo = 'SAIDA'    
+        AND PPE.tipo = 'SAIDA'
 
     UNION ALL
 
     -- (-) Pedidos Estoque Reservados
-    SELECT 
+    SELECT
         PPI.produto_id,
         ISNULL(PPI.quantidade_atendida, 0) * -1 AS quantidade_estoque
       FROM PEDIDO_ITENS AS PPI
@@ -123,7 +124,7 @@ SELECT
    ) AS PE ON PE.produto_id = P.id
 
    WHERE P.ativo = 1
-   GROUP BY P.id
+   GROUP BY P.id, p.nome
 
 GO
 

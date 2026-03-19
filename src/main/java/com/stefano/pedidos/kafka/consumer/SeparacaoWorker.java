@@ -6,12 +6,15 @@ import com.stefano.pedidos.kafka.constants.KafkaTopics;
 import com.stefano.pedidos.kafka.event.PedidoEvent;
 import com.stefano.pedidos.kafka.producer.PedidoProducer;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SeparacaoWorker {
 
+    private static final Logger logger = LoggerFactory.getLogger(SeparacaoWorker.class);
     private final PedidoRepository pedidoRepository;
     private final PedidoProducer pedidoProducer;
 
@@ -32,8 +35,7 @@ public class SeparacaoWorker {
         pedidoRepository.save(pedido);
         pedidoProducer.publicar(pedido);
 
-        //todo: adicionar logger
-        System.out.println("Topico processado %s para o pedido %d, status atual %s".formatted(KafkaTopics.PEDIDO_RESERVADO_ESTOQUE, pedido.getId(), pedido.getStatus()));
+        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", KafkaTopics.PEDIDO_RESERVADO_ESTOQUE, pedido.getId(), pedido.getStatus());
     }
 
     @KafkaListener(topics = KafkaTopics.PEDIDO_EM_SEPARACAO)
@@ -48,7 +50,6 @@ public class SeparacaoWorker {
         pedidoRepository.save(pedido);
         pedidoProducer.publicar(pedido);
 
-        //todo: adicionar logger
-        System.out.println("Topico processado %s para o pedido %d, status atual %s".formatted(KafkaTopics.PEDIDO_EM_SEPARACAO, pedido.getId(), pedido.getStatus()));
+        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", KafkaTopics.PEDIDO_EM_SEPARACAO, pedido.getId(), pedido.getStatus());
     }
 }

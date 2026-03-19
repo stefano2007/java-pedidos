@@ -44,7 +44,7 @@ public class PedidoController {
     }
 
     @PostMapping("{pedidoId}/validar")
-    public ResponseEntity<PedidoResponse> validarPedido(@PathVariable("pedidoId") Long pedidoId, @Valid @RequestBody ValidarPedidoRequest request) {
+    public ResponseEntity<PedidoResponse> validarPedido(@PathVariable("pedidoId") Long pedidoId) {
         PedidoResponse pedidoResponse = pedidoService.validarPedido(pedidoId);
         return ResponseEntity.ok().body(pedidoResponse);
     }

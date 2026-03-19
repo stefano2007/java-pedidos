@@ -9,10 +9,6 @@ import jakarta.validation.constraints.Positive;
 import java.util.List;
 
 public record PedidoRequest(
-        @NotNull(message = "Usuário é obrigatório")
-        @Positive(message = "Usuário inválido")
-        Long usuarioId,
-
         @NotEmpty(message = "O pedido deve possuir ao menos um item")
         @Valid
         List<PedidoItemRequest> itens

@@ -1,6 +1,5 @@
 package com.stefano.pedidos.endpoints.pedidos.service;
 
-import com.stefano.pedidos.config.model.UserPrincipal;
 import com.stefano.pedidos.endpoints.estoques.entity.ProdutoEstoqueAtualView;
 import com.stefano.pedidos.endpoints.estoques.service.EstoqueService;
 import com.stefano.pedidos.endpoints.pedidos.dto.request.CancelarPedidoRequest;
@@ -16,10 +15,12 @@ import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.endpoints.usuarios.service.UsuarioService;
 import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
 import com.stefano.pedidos.kafka.producer.PedidoProducer;
+import com.stefano.pedidos.util.CustomerInfo;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,18 +29,23 @@ import java.util.Optional;
 @Service
 public class PedidoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PedidoService.class);
+
     private final PedidoRepository pedidoRepository;
     private final UsuarioService usuarioService;
     private final ProdutoService produtoService;
     private final EstoqueService estoqueService;
     private final PedidoProducer pedidoProducer;
+    private final CustomerInfo customerInfo;
 
-    public PedidoService(PedidoRepository pedidoRepository, UsuarioService usuarioService, ProdutoService produtoService, EstoqueService estoqueService, PedidoProducer pedidoProducer) {
+    public PedidoService(PedidoRepository pedidoRepository, UsuarioService usuarioService, ProdutoService produtoService,
+                         EstoqueService estoqueService, PedidoProducer pedidoProducer, CustomerInfo customerInfo) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioService = usuarioService;
         this.produtoService = produtoService;
         this.estoqueService = estoqueService;
         this.pedidoProducer = pedidoProducer;
+        this.customerInfo = customerInfo;
     }
 
     public Page<PedidoResponse> obterTodos(Pageable pageable) {
@@ -48,14 +54,21 @@ public class PedidoService {
     }
 
     public PedidoResponse obterPorId(Long pedidoId) {
-        return PedidoResponse.of(obterPedidoOuExcecao(pedidoId));
+        Pedido pedido = obterPedidoOuExcecao(pedidoId);
+
+        logger.info("Pedido retornado com sucesso: {}", pedidoId);
+        return PedidoResponse.of(pedido);
     }
 
     @Transactional
     public PedidoResponse criarPedido(PedidoRequest request) {
 
         // validar usuário
-        Usuario usuario = usuarioService.obterUsuarioOuExcecao(request.usuarioId());
+        Long usuarioId = customerInfo.obterUsuariIdOuNulo();
+        if (usuarioId == null) {
+            throw new RecursoNaoEncontradoException("Usuário autenticado não encontrado para criar o pedido.");
+        }
+        Usuario usuario = usuarioService.obterUsuarioOuExcecao(usuarioId);
 
         Pedido novoPedido = Pedido.criarPedido(usuario);
 
@@ -76,6 +89,7 @@ public class PedidoService {
         novoPedido.adicionarPedidoItens(pedidoItens);
         pedidoRepository.save(novoPedido);
 
+        logger.info("Pedido criado: {}, Usuario: {}", novoPedido.getId(), usuario.getId());
         return PedidoResponse.of(novoPedido);
     }
 
@@ -90,6 +104,7 @@ public class PedidoService {
         this.pedidoRepository.save(pedido);
         this.pedidoProducer.publicar(pedido);
 
+        logger.info("Pedido validado: {}", pedido.getId());
         return PedidoResponse.of(pedido);
     }
 
@@ -99,15 +114,20 @@ public class PedidoService {
         //validar pedido
         Pedido pedido = obterPedidoOuExcecao(pedidoId);
 
-        UserPrincipal usuarioLogado = obterUsuarioLogado();
+        Long usuarioId = customerInfo.obterUsuariIdOuNulo();
+        if (usuarioId == null) {
+            throw new RecursoNaoEncontradoException("Usuário autenticado não encontrado para cancelar o pedido.");
+        }
+
         final String mensagemCompleto = "Id Usuario Cancelamento: %s, Motivo do cancelamento: %s"
-                .formatted(usuarioLogado.getUsuarioId(), request.motivoCancelamento());
+                .formatted(usuarioId, request.motivoCancelamento());
 
         pedido.cancelar(mensagemCompleto);
 
         this.pedidoRepository.save(pedido);
         this.pedidoProducer.publicar(pedido);
 
+        logger.info("Pedido cancelado: {}, {}", pedido.getId(), mensagemCompleto);
         return PedidoResponse.of(pedido);
     }
 
@@ -137,6 +157,7 @@ public class PedidoService {
         pedido.alterarStatusReservadoEstoqueOuCancelar();
         pedidoRepository.save(pedido);
 
+        logger.info("Reserva de estoque processada para Pedido: {}, Status: {}", pedido.getId(), pedido.getStatus());
         return pedido;
     }
 
@@ -147,9 +168,5 @@ public class PedidoService {
     public Pedido obterPedidoOuExcecao(Long pedidoId) {
         return this.obterPedido(pedidoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado: %s".formatted(pedidoId)));
-    }
-
-    private UserPrincipal obterUsuarioLogado() {
-        return (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
