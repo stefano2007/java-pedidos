@@ -9,6 +9,7 @@ import com.stefano.pedidos.endpoints.usuarios.exception.SenhaInvalidaException;
 import com.stefano.pedidos.endpoints.usuarios.exception.UsuarioJaExisteException;
 import com.stefano.pedidos.endpoints.usuarios.repository.UsuarioRepository;
 import com.stefano.pedidos.exception.RecursoNaoEncontradoException;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +29,7 @@ public class UsuarioService {
         this.roleService = roleService;
     }
 
+    @Transactional
     public UsuarioResponse criar(UsuarioRequest request) {
         if (!request.senha().equals(request.confirmacaoSenha())) {
             throw new SenhaInvalidaException("Senha de confirmação diferente da senha informada");
@@ -59,7 +61,7 @@ public class UsuarioService {
         return UsuarioResponse.of(obterUsuarioOuExcecao(usuarioId));
     }
 
-    private Optional<Usuario> obterPorEmail(String email){
+    public Optional<Usuario> obterPorEmail(String email){
         return usuarioRepository.findByEmail(email);
     }
 

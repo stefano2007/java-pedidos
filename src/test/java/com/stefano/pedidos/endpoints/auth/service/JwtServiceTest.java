@@ -15,19 +15,23 @@ import static com.stefano.pedidos.util.PedidoContantes.PERSON_ID_TOKEN;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
-@TestPropertySource(properties = {"seguraca.jwt.secret=test-secret-key-with-minimum-length-for-hs256-algorithm-needs-32-bytes"})
+@TestPropertySource(properties = {
+        "seguraca.jwt.secret=test-secret-key-with-minimum-length-for-hs256-algorithm-needs-32-bytes",
+        "seguraca.jwt.expiration=3600000",
+        "seguraca.jwt.refresh-expiration=86400000"
+})
 @DisplayName("JwtService - Testes Unitários")
 class JwtServiceTest {
 
     private JwtService jwtService;
-    
+
     @Value("${seguraca.jwt.secret}")
     private String jwtSecret;
 
     @Value("${seguraca.jwt.expiration}")
     private long jwtExpiration;
 
-    @Value("${seguraca.jwt.refreshExpiration}")
+    @Value("${seguraca.jwt.refresh-expiration}")
     private long refreshExpiration;
 
     @BeforeEach
@@ -38,6 +42,14 @@ class JwtServiceTest {
             var field = JwtService.class.getDeclaredField("jwtSecret");
             field.setAccessible(true);
             field.set(jwtService, jwtSecret);
+
+            var field2 = JwtService.class.getDeclaredField("jwtExpiration");
+            field2.setAccessible(true);
+            field2.set(jwtService, jwtExpiration);
+
+            var field3 = JwtService.class.getDeclaredField("refreshExpiration");
+            field3.setAccessible(true);
+            field3.set(jwtService, refreshExpiration);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -54,9 +66,9 @@ class JwtServiceTest {
 
         // Assert
         assertThat(token)
-            .isNotNull()
-            .isNotBlank()
-            .contains(".");
+                .isNotNull()
+                .isNotBlank()
+                .contains(".");
     }
 
     @Test
@@ -70,9 +82,9 @@ class JwtServiceTest {
 
         // Assert
         assertThat(token)
-            .isNotNull()
-            .isNotBlank()
-            .contains(".");
+                .isNotNull()
+                .isNotBlank()
+                .contains(".");
     }
 
     @Test
@@ -126,7 +138,7 @@ class JwtServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> jwtService.extrairUsuario(tokenInvalido))
-            .isInstanceOf(JwtException.class);
+                .isInstanceOf(JwtException.class);
     }
 
     @Test

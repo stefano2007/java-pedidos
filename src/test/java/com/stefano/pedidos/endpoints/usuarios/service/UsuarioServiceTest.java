@@ -1,7 +1,9 @@
 package com.stefano.pedidos.endpoints.usuarios.service;
 
+import com.stefano.pedidos.config.model.RolesUsuario;
 import com.stefano.pedidos.endpoints.usuarios.dto.request.UsuarioRequest;
 import com.stefano.pedidos.endpoints.usuarios.dto.response.UsuarioResponse;
+import com.stefano.pedidos.endpoints.usuarios.entity.Role;
 import com.stefano.pedidos.endpoints.usuarios.entity.Usuario;
 import com.stefano.pedidos.endpoints.usuarios.exception.SenhaInvalidaException;
 import com.stefano.pedidos.endpoints.usuarios.exception.UsuarioJaExisteException;
@@ -37,12 +39,18 @@ class UsuarioServiceTest {
     @InjectMocks
     private UsuarioService usuarioService;
 
+    @Mock
+    private RoleService roleService;
+
     private Usuario usuario;
 
     @BeforeEach
     void preparar() {
         MockitoAnnotations.openMocks(this);
         usuario = mock(Usuario.class);
+
+        when(roleService.obterRolePorNome(RolesUsuario.USER.getNome()))
+                .thenReturn(new Role(RolesUsuario.USER.getNome(), "Role de usuário comum"));
     }
 
     @Test
@@ -62,6 +70,8 @@ class UsuarioServiceTest {
             .thenReturn("senha_criptografada");
         when(usuarioRepository.save(any(Usuario.class)))
             .thenReturn(usuario);
+
+
 
         // Act
         UsuarioResponse resultado = usuarioService.criar(requisicao);
