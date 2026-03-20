@@ -24,6 +24,12 @@ class JwtServiceTest {
     @Value("${seguraca.jwt.secret}")
     private String jwtSecret;
 
+    @Value("${seguraca.jwt.expiration}")
+    private long jwtExpiration;
+
+    @Value("${seguraca.jwt.refreshExpiration}")
+    private long refreshExpiration;
+
     @BeforeEach
     void preparar() {
         jwtService = new JwtService();

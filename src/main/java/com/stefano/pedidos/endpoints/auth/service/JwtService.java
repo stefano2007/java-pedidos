@@ -25,8 +25,11 @@ public class JwtService {
     @Value("${seguraca.jwt.secret}")
     private String jwtSecret;
 
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15; // 15 minutos
-    private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7 dias
+    @Value("${seguraca.jwt.expiration}")
+    private Long jwtExpiration;
+
+    @Value("${seguraca.jwt.refresh-expiration}")
+    private Long refreshExpiration;
 
     private Key getSignKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
@@ -40,7 +43,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignKey())
                 .compact();
     }
@@ -65,7 +68,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getSignKey())
                 .compact();
     }
