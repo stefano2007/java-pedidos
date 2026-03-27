@@ -40,6 +40,7 @@ public class PedidoProducer {
 
     private String escolherTopico(Pedido pedido) {
         return switch (pedido.getStatus()) {
+            case CRIADO -> KafkaTopics.PEDIDO_CRIADO;
             case VALIDADO -> KafkaTopics.PEDIDO_VALIDADO;
             case RESERVADO_ESTOQUE -> KafkaTopics.PEDIDO_RESERVADO_ESTOQUE;
             case EM_SEPARACAO -> KafkaTopics.PEDIDO_EM_SEPARACAO;

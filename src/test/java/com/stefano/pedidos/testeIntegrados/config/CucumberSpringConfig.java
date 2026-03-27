@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 @EmbeddedKafka(
         partitions = 1,
         topics = {
+                KafkaTopics.PEDIDO_CRIADO,
                 KafkaTopics.PEDIDO_VALIDADO,
                 KafkaTopics.PEDIDO_RESERVADO_ESTOQUE,
                 KafkaTopics.PEDIDO_EM_SEPARACAO,

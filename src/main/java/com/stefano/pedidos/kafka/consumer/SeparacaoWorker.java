@@ -26,30 +26,52 @@ public class SeparacaoWorker {
     @KafkaListener(topics = KafkaTopics.PEDIDO_RESERVADO_ESTOQUE)
     @Transactional
     public void consumir(PedidoEvent event) {
-
+        /**
+         * Aqui é onde a lógica de separação do pedido deve ser implementada.
+         * Por exemplo, comunicar o setor de separação para separar os itens do pedido, atualizar o status do pedido, etc.
+         */
         Pedido pedido = pedidoRepository.findById(event.pedidoId())
                 .orElseThrow();
+
+        esperaProgramadaEmSegundos(2); // Simula um tempo de processamento para separação do pedido
 
         pedido.alterarStatusEmSeparacao();
 
         pedidoRepository.save(pedido);
         pedidoProducer.publicar(pedido);
 
-        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", KafkaTopics.PEDIDO_RESERVADO_ESTOQUE, pedido.getId(), pedido.getStatus());
+        criarLogSucesso(KafkaTopics.PEDIDO_RESERVADO_ESTOQUE, pedido);
     }
 
     @KafkaListener(topics = KafkaTopics.PEDIDO_EM_SEPARACAO)
     @Transactional
     public void consumirEmSeparacao(PedidoEvent event) {
-
+        /**
+         * Aqui é onde a lógica de separação do pedido deve ser implementada.
+         * Por exemplo, comunicar o setor de separação para separar os itens do pedido, atualizar o status do pedido, etc.
+         */
         Pedido pedido = pedidoRepository.findById(event.pedidoId())
                 .orElseThrow();
+
+        esperaProgramadaEmSegundos(1); // Simula um tempo de processamento para separação do pedido
 
         pedido.alterarStatusSeparado();
 
         pedidoRepository.save(pedido);
         pedidoProducer.publicar(pedido);
 
-        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", KafkaTopics.PEDIDO_EM_SEPARACAO, pedido.getId(), pedido.getStatus());
+        criarLogSucesso(KafkaTopics.PEDIDO_EM_SEPARACAO, pedido);
+    }
+
+    private void criarLogSucesso(String topicoAtual, Pedido pedido) {
+        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", topicoAtual, pedido.getId(), pedido.getStatus());
+    }
+
+    private void esperaProgramadaEmSegundos(int segundos) {
+        try {
+            Thread.sleep(segundos * 1000L);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

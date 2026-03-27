@@ -88,28 +88,14 @@ public class PedidoService {
 
         novoPedido.adicionarPedidoItens(pedidoItens);
         pedidoRepository.save(novoPedido);
+        this.pedidoProducer.publicar(novoPedido);
 
         logger.info("Pedido criado: {}, Usuario: {}", novoPedido.getId(), usuario.getId());
         return PedidoResponse.of(novoPedido);
     }
 
     @Transactional
-    public PedidoResponse validarPedido(Long pedidoId) {
-
-        //validar pedido
-        Pedido pedido = obterPedidoOuExcecao(pedidoId);
-
-        pedido.alterarStatusValidado();
-
-        this.pedidoRepository.save(pedido);
-        this.pedidoProducer.publicar(pedido);
-
-        logger.info("Pedido validado: {}", pedido.getId());
-        return PedidoResponse.of(pedido);
-    }
-
-    @Transactional
-    public PedidoResponse cancelarPedido(Long pedidoId, CancelarPedidoRequest request) {
+    public PedidoResponse cancelarPedidoManualmente(Long pedidoId, CancelarPedidoRequest request) {
 
         //validar pedido
         Pedido pedido = obterPedidoOuExcecao(pedidoId);
@@ -129,36 +115,6 @@ public class PedidoService {
 
         logger.info("Pedido cancelado: {}, {}", pedido.getId(), mensagemCompleto);
         return PedidoResponse.of(pedido);
-    }
-
-
-    @Transactional
-    public synchronized Pedido reservarEstoquePedido(Long pedidoId) {
-
-        Pedido pedido = obterPedidoOuExcecao(pedidoId);
-
-        for (PedidoItem item : pedido.getItens().stream().filter(i -> i.getStatusItem() == StatusPedidoItem.VALIDADO).toList()) {
-
-            final Integer estoqueAtual = estoqueService.obterProdutoEstoqueAtualView(item.getProduto().getId())
-                    .map(ProdutoEstoqueAtualView::getQuantidadeEstoque)
-                    .orElse(0);
-
-            final int quantidadeAtendida = estoqueAtual >= item.getQuantidade()
-                    ? item.getQuantidade()
-                    : Math.max(estoqueAtual, 0);
-
-            if (quantidadeAtendida > 0) {
-                item.reservarEstoque(quantidadeAtendida);
-            } else {
-                item.semEstoque("Estoque insuficiente");
-            }
-        }
-
-        pedido.alterarStatusReservadoEstoqueOuCancelar();
-        pedidoRepository.save(pedido);
-
-        logger.info("Reserva de estoque processada para Pedido: {}, Status: {}", pedido.getId(), pedido.getStatus());
-        return pedido;
     }
 
     public Optional<Pedido> obterPedido(Long pedidoId) {

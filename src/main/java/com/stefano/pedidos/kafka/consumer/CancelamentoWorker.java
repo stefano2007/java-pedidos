@@ -23,10 +23,12 @@ public class CancelamentoWorker {
     @KafkaListener(topics = KafkaTopics.CANCELADO)
     @Transactional
     public void consumirCancelado(PedidoEvent event) {
-
+        /**
+         * Aqui é onde a lógica de cancelamento do pedido deve ser implementada.
+         * Por exemplo, comunicar o cliente sobre o cancelamento, liberar estoque reservado, estornar pagamento, etc.
+         */
         Pedido pedido = pedidoRepository.findById(event.pedidoId())
                 .orElseThrow();
-
         logger.info("Pedido cancelado: {}", pedido.getId());
     }
 

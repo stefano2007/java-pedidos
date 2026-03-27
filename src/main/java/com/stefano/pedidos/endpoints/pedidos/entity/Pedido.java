@@ -74,17 +74,9 @@ public class Pedido {
         return StatusPedido.CRIADO.equals(this.status);
     }
 
-    public boolean validado() {
-        return StatusPedido.VALIDADO.equals(this.status);
-    }
-
     public void alterarStatusValidado() {
         this.alterarStatus(StatusPedido.VALIDADO);
         this.itens.forEach(PedidoItem::validarPeditoItem);
-    }
-
-    public boolean reservadoEstoque() {
-        return StatusPedido.RESERVADO_ESTOQUE.equals(this.status);
     }
 
     public void alterarStatusReservadoEstoqueOuCancelar() {
@@ -94,32 +86,16 @@ public class Pedido {
         }
     }
 
-    public boolean emSeperacao() {
-        return StatusPedido.EM_SEPARACAO.equals(this.status);
-    }
-
     public void alterarStatusEmSeparacao() {
         this.alterarStatus(StatusPedido.EM_SEPARACAO);
-    }
-
-    public boolean separado() {
-        return StatusPedido.SEPARADO.equals(this.status);
     }
 
     public void alterarStatusSeparado() {
         this.alterarStatus(StatusPedido.SEPARADO);
     }
 
-    public boolean emTransporte() {
-        return StatusPedido.EM_TRANSPORTE.equals(this.status);
-    }
-
     public void alterarStatusEmTransporte() {
         this.alterarStatus(StatusPedido.EM_TRANSPORTE);
-    }
-
-    public boolean entregue() {
-        return StatusPedido.ENTREGUE.equals(this.status);
     }
 
     public void alterarStatusEntregue() {
@@ -186,6 +162,5 @@ public class Pedido {
     public List<PedidoStatus> getHistoricoStatus() {
         return historicoStatus;
     }
-
 
 }

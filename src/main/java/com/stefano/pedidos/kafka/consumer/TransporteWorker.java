@@ -26,42 +26,68 @@ public class TransporteWorker {
     @KafkaListener(topics = KafkaTopics.PEDIDO_SEPARADO)
     @Transactional
     public void consumirSeparacao(PedidoEvent event) {
-
+        /**
+         * Aqui é onde a lógica de transporte do pedido deve ser implementada.
+         * Por exemplo, comunicar o setor de logística para realizar a entrega, calcular o prazo de entrega, etc.
+         */
         Pedido pedido = pedidoRepository.findById(event.pedidoId())
                 .orElseThrow();
+
+        esperaProgramadaEmSegundos(2);
 
         pedido.alterarStatusEmTransporte();
 
         pedidoRepository.save(pedido);
         pedidoProducer.publicar(pedido);
 
-        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", KafkaTopics.PEDIDO_SEPARADO, pedido.getId(), pedido.getStatus());
+        criarLogSucesso(KafkaTopics.PEDIDO_SEPARADO, pedido);
     }
 
     @KafkaListener(topics = KafkaTopics.PEDIDO_EM_TRANSPORTE)
     @Transactional
     public void consumirEmTransporte(PedidoEvent event) {
-
+        /**
+        * Aqui é onde a lógica de transporte do pedido deve ser implementada.
+        * Por exemplo, comunicar a transportadora, atualizar o status do pedido, etc.
+        */
         Pedido pedido = pedidoRepository.findById(event.pedidoId())
                 .orElseThrow();
+
+        esperaProgramadaEmSegundos(3);
 
         pedido.alterarStatusEntregue();
 
         pedidoRepository.save(pedido);
         pedidoProducer.publicar(pedido);
 
-        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", KafkaTopics.PEDIDO_EM_TRANSPORTE, pedido.getId(), pedido.getStatus());
+        criarLogSucesso(KafkaTopics.PEDIDO_EM_TRANSPORTE, pedido);
     }
 
     @KafkaListener(topics = KafkaTopics.PEDIDO_ENTREGUE)
     @Transactional
     public void consumirEntregue(PedidoEvent event) {
+        /**
+         * Aqui é onde a lógica de pós-entrega do pedido deve ser implementada.
+         * Por exemplo, comunicar o cliente sobre a entrega, solicitar feedback, etc.
+         */
 
         Pedido pedido = pedidoRepository.findById(event.pedidoId())
                 .orElseThrow();
 
-        // fazer algo aqui
+        esperaProgramadaEmSegundos(1);
 
         logger.info("Pedido entregue: {}", pedido.getId());
+    }
+
+    private void criarLogSucesso(String topicoAtual, Pedido pedido) {
+        logger.info("Tópico processado: {}, PedidoId: {}, Status atual: {}", topicoAtual, pedido.getId(), pedido.getStatus());
+    }
+
+    private void esperaProgramadaEmSegundos(int segundos) {
+        try {
+            Thread.sleep(segundos * 1000L);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
