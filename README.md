@@ -24,6 +24,8 @@ API RESTful para gerenciamento de pedidos, produtos, usuários e estoque com aut
 
 ## 🏗️ Arquitetura
 
+![Estrutura do projeto](/readme/arquitetura.png)
+
 O projeto segue a arquitetura **Clean Architecture** com separação clara de responsabilidades em camadas:
 
 ### Estrutura de Pastas

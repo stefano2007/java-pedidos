@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
 
         ErroResponse erroResponse = new ErroResponse(
                 LocalDateTime.now(),
-                400,
+                HttpStatus.BAD_REQUEST.value(),
                 erro,
                 request.getRequestURI()
         );
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErroResponse(
                         LocalDateTime.now(),
-                        404,
+                        HttpStatus.NOT_FOUND.value(),
                         ex.getMessage(),
                         request.getRequestURI()
                 ));
@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErroResponse(
                         LocalDateTime.now(),
-                        400,
+                        HttpStatus.BAD_REQUEST.value(),
                         ex.getMessage(),
                         request.getRequestURI()
                 ));
@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErroResponse(
                         LocalDateTime.now(),
-                        409,
+                        HttpStatus.CONFLICT.value(),
                         ex.getMessage(),
                         request.getRequestURI()
                 ));
@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErroResponse(
                         LocalDateTime.now(),
-                        400,
+                        HttpStatus.CONFLICT.value(),
                         ex.getMessage(),
                         request.getRequestURI()
                 ));
